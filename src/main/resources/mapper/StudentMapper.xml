@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.duansanniu.mapper.StudentMapper">
+    
+    <resultMap id="Subjects" type="cn.duansanniu.entity.Subjects">
+        <id property="id" column="subject_id"></id>
+        <result property="title" column="title"/>
+        <result property="detail" column="detail" />
+        <association property="teacher" >
+            <id property="id" column="teacher_id"/>
+            <result property="username" column="teacher_username"/>
+            <result property="name" column="teacher_name" />
+            <result property="sex" column="teacher_sex"/>
+            <result property="professionRank" column="teacher_professionRank"/>
+            <result property="degree" column="teacher_degree"/>
+        </association>
+        <association property="student">
+            <id property="id" column="student_id"/>
+            <result property="username" column="student_username"/>
+            <result property="name" column="student_name"/>
+            <result property="sex" column="student_sex"/>
+        </association>
+    </resultMap>
+
+
+    <!--获取课题列表信息 -->
+    <select id="getSubjects" resultMap="Subjects">
+        select tts.id as subject_id,tts.title,tts.detail,
+                tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
+                ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex  from t_teacher_subject tts
+          left join t_teacher tt on tt.id = tts.teacherId
+          left join t_student_subject tss on tts.id = tss.subjectId
+          left join t_student ts on ts.username = tss.username
+    </select>
+
+    <!--获取某个学生所报的课题的详情-->
+    <select id="getSubject" resultMap="Subjects" parameterType="cn.duansanniu.entity.Student">
+        select tts.id as subject_id,tts.title,tts.detail,
+                tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
+                ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex  from t_teacher_subject tts
+          left join t_teacher tt on tt.id = tts.teacherId
+          left join t_student_subject tss on tts.id = tss.subjectId
+          left join t_student ts on ts.username = tss.username
+
+        <choose>
+            <when test="id!= null and id != 0">
+                where ts.id = #{id}
+            </when>
+            <when test="username!=null and username.length > 0">
+                where ts.username = #{username}
+            </when>
+        </choose>
+    </select>
+
+    <!--判断某个学生已经选择了题 或者 这个题已经被别人选了-->
+    <select id="isSelect" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_student_subject where username = #{username} or subjectId = #{subjectId}
+    </select>
+
+
+
+    <!--选择课题-->
+    <insert id="selectSubject" parameterType="map">
+        insert into  t_student_subject(username,subjectId,status) values(#{username},#{subjectId},1)
+    </insert>
+
+
+
+</mapper>
