@@ -6,14 +6,22 @@ import cn.duansanniu.service.StudentService;
 import cn.duansanniu.utils.ResponseEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.sun.org.glassfish.gmbal.ParameterNames;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +37,8 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+
+
 
 
     /**
@@ -111,5 +121,53 @@ public class StudentController {
         }
     }
 
+
+    /**
+     * 有关常用表的下载
+     */
+    @GetMapping("/download")
+    @ResponseBody
+    @ApiOperation(value = "用于下载常用表")
+    @ApiImplicitParam(name = "fileName",value = "文件的名字",required = true,paramType = "query")
+    public ResponseEntity downloadApplyTable(
+            @RequestParam(value = "fileName") String fileName, HttpServletRequest request, HttpServletResponse response){
+        try{
+
+            //获取文件路径
+            String url = studentService.getFilePath(fileName);
+            if(url.length() < 0) return new ResponseEntity(0,"下载失败",null);
+            File file = new File(url);
+            FileInputStream fis = new FileInputStream(file);
+            //获取后缀名
+            String extendFileName = fileName.substring(fileName.lastIndexOf("."));
+            //动态设置响应类型 根据前台传递文件类型设置响应类型
+            response.setContentType(request.getSession().getServletContext().getMimeType(extendFileName));
+            //设置响应头,attachment表示以附件的形式下载，inline表示在线打开
+            response.setHeader("content-disposition","attachment;fileName="+ URLEncoder.encode(fileName,"UTF-8"));
+            //获取输出流对象
+            ServletOutputStream os = response.getOutputStream();
+            //下载文件使用 spring框架中的FileCopyUtils工具
+            FileCopyUtils.copy(fis,os);
+
+            return new ResponseEntity(0,"下载成功",null);
+
+        }catch(Exception e){
+            return new ResponseEntity(0,"下载失败",null);
+        }
+    }
+
+    /**
+     * 用于学生表文件的上传
+     */
+    @PostMapping("/uploadFile")
+    @ResponseBody
+    @ApiOperation(value = "用于学生表文件的上传")
+    public ResponseEntity uploadFile(){
+        try{
+            return new ResponseEntity(1,"上传成功",null);
+        }catch(Exception e){
+            return new ResponseEntity(0,"上传失败",null);
+        }
+    }
 
 }

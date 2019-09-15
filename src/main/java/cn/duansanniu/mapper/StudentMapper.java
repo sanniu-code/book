@@ -21,4 +21,6 @@ public interface StudentMapper {
 
     public Integer isSelect(Map map);
 
+    public String getFilePath(String fileName);
+
 }

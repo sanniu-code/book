@@ -41,4 +41,11 @@ public class StudentServiceImpl implements StudentService {
         Integer num =  studentMapper.selectSubject(map);
         return num;
     }
+
+    @Override
+    public String getFilePath(String fileName) {
+
+
+        return studentMapper.getFilePath(fileName);
+    }
 }

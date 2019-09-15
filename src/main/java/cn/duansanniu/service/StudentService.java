@@ -18,4 +18,6 @@ public interface StudentService {
     public Subjects getSubject(Student student);
 
     public Integer selectSubject(Map map);
+
+    public String getFilePath(String fileName);
 }

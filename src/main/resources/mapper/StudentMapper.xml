@@ -66,5 +66,10 @@
     </insert>
 
 
+    <select id="getFilePath" parameterType="String" resultType="String">
+        select url from t_commonFile where name = #{fileName}
+    </select>
+
+
 
 </mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.duansanniu.mapper.LeaderMapper">
+    <insert id="preserveCommonFileInfo" parameterType="map">
+        insert into t_commonFile(name,url,createTime) values(#{name},#{url},#{createTime})
+    </insert>
+
+    <select id="isPreserve" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_commonFile
+          where name = #{name} and url = #{url}
+    </select>
+
+    <update id="updateCommonFileInfo" parameterType="map" >
+        update t_commonFile set createTime = #{createTime}
+          where name = #{name} and url=#{url}
+
+    </update>
+</mapper>

@@ -37,10 +37,21 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
      public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        //用于swagger
         registry.addResourceHandler("swagger-ui.html")
                 .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        //用于领导上传文件
+        registry.addResourceHandler("/commonFile/**")
+                .addResourceLocations("classpath:/static/commonFile/");
+        //这是学生上传的文件
+        registry.addResourceHandler("/studentFile/**")
+                .addResourceLocations("classpath:/static/studentFile/");
+
+        //这是老师上传的文件
+        registry.addResourceHandler("/teacherFile/**")
+                .addResourceLocations("classpath:/static/teacherFile/");
         super.addResourceHandlers(registry);
      }
 }
