@@ -17,8 +17,10 @@ public class Teacher {
     private Integer sex;
     private String professionRank;
     private String degree;
+    private Integer status;
+    private Depart depart;
 
-    public Teacher(Integer id, String username, String password, String name, Integer sex, String professionRank, String degree) {
+    public Teacher(Integer id, String username, String password, String name, Integer sex, String professionRank, String degree, Integer status, Depart depart) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -26,6 +28,8 @@ public class Teacher {
         this.sex = sex;
         this.professionRank = professionRank;
         this.degree = degree;
+        this.status = status;
+        this.depart = depart;
     }
 
     public Teacher() {

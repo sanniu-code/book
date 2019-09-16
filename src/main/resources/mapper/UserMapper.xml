@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.duansanniu.mapper.UserMapper">
+
+
+
+
+    <select id="studentLogin" parameterType="cn.duansanniu.entity.User" resultType="map">
+        select ts.*,tc.name className,tp.name professionName,td.name departName  from t_student ts
+          left join t_class  tc on tc.id = ts.classid
+          left join t_profession tp on tp.id = tc.professionid
+          left join t_depart td on td.id = tp.departId
+          where ts.username = #{username} and ts.password = #{password}
+    </select>
+
+    <select id="teacherLogin" parameterType="cn.duansanniu.entity.User" resultType="cn.duansanniu.entity.Teacher">
+        select tt.*,td.name departName from t_teacher tt
+          left join t_depart td  on td.id = tt.departId
+          where tt.username = #{username} and tt.password = #{password}
+    </select>
+
+    <select id="leaderLogin" parameterType="cn.duansanniu.entity.User" resultType="cn.duansanniu.entity.Leader">
+        select * from t_leader where username = #{username} and password = #{password}
+    </select>
+</mapper>

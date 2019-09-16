@@ -6,7 +6,6 @@ import cn.duansanniu.service.StudentService;
 import cn.duansanniu.utils.ResponseEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sun.org.glassfish.gmbal.ParameterNames;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -14,7 +13,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +38,9 @@ import java.util.Map;
 @Api("关于学生的API")
 public class StudentController {
 
+
     @Autowired
     private StudentService studentService;
-
 
 
 
@@ -162,8 +165,54 @@ public class StudentController {
     @PostMapping("/uploadFile")
     @ResponseBody
     @ApiOperation(value = "用于学生表文件的上传")
-    public ResponseEntity uploadFile(){
+    public ResponseEntity uploadFile(MultipartFile file, HttpServletRequest request,HttpServletResponse response){
         try{
+
+            //获取文件名字
+            String name = file.getOriginalFilename();
+
+            File root = new File(ResourceUtils.getFile("classpath:").getPath());
+            if(!root.exists())
+                root = new File("");
+            //获取studentFile文件
+            File studentFile = new File(root.getAbsolutePath(),"static/studentFile/");
+            if(!studentFile.exists())
+                studentFile.mkdirs();
+
+
+            //获取当前年份
+            Date d = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+            String year = sdf.format(d);
+
+
+
+            //目前 当前年份 + 学号
+            // 之后 当前年份 + 系别 + 班级 + 学号
+            //String url = year+File.separator+username+File.separator;
+
+            //获取当前登录人的信息
+            Map map = (HashMap)request.getSession().getAttribute("userInfo");
+            System.out.println(map);
+            String url = year+File.separator+map.get("departName")+File.separator+map.get("professionName")+File.separator+map.get("className")+File.separator+map.get("username")+File.separator;
+
+            //生成年文件夹
+            File yearFile = new File(studentFile.getAbsolutePath(),url);
+            if(!yearFile.exists())
+                yearFile.mkdirs();
+
+
+
+            File finalFile = new File(yearFile.getPath()+File.separator+name);
+            file.transferTo(finalFile);
+
+
+
+
+
+
+
+
             return new ResponseEntity(1,"上传成功",null);
         }catch(Exception e){
             return new ResponseEntity(0,"上传失败",null);
