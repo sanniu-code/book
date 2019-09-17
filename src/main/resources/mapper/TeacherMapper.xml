@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.duansanniu.mapper.TeacherMapper">
+
+
+    <select id="isGuideTeacher" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_student_subject tss
+          left join t_teacher_subject tts on tts.id = tss.subjectId
+          where tss.username = #{username} and tts.teacherId = #{teacherId}
+    </select>
+
+    <!--保存开题要求-->
+    <insert id="storeReport" parameterType="map" >
+        insert into t_teacher_file(username,name,url,teacherId,createTime) values(
+          #{username},#{name},#{url},#{teacherId},#{createTime}
+        )
+    </insert>
+
+    <select id="getNotExamineFiles" parameterType="String" resultType="cn.duansanniu.entity.StudentUploadFile">
+        select tsf.* from t_teacher_subject tts
+          left join t_student_subject tss on tss.subjectId = tts.id
+          left join t_student_file tsf on tsf.username = tss.username
+          where tsf.status = 0 and tts.username = #{username}
+    </select>
+
+    <update id="examineStudentUploadFile" parameterType="cn.duansanniu.entity.StudentUploadFile">
+        update t_student_file  set status = 1 where id = #{id}
+
+    </update>
+
+    <update id="failExamineStudentUploadFile" parameterType="cn.duansanniu.entity.StudentUploadFile">
+        update t_student_file  set status = 2 where id = #{id}
+
+    </update>
+
+    <select id="getExamineFiles" parameterType="String" resultType="cn.duansanniu.entity.StudentUploadFile">
+        select tsf.* from t_teacher_subject tts
+          left join t_student_subject tss on tss.subjectId = tts.id
+          left join t_student_file tsf on tsf.username = tss.username
+          where tsf.status = 1 and tts.username = #{username}
+    </select>
+
+</mapper>
+

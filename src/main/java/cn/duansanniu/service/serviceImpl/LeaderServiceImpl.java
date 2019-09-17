@@ -1,10 +1,12 @@
 package cn.duansanniu.service.serviceImpl;
 
+import cn.duansanniu.entity.Teacher;
 import cn.duansanniu.mapper.LeaderMapper;
 import cn.duansanniu.service.LeaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,5 +35,31 @@ public class LeaderServiceImpl implements LeaderService {
 
 
 
+    }
+
+    @Override
+    public List<Teacher> getTeachersByDepartId(Integer id) {
+
+        return leaderMapper.getTeachersByDepartId(id);
+    }
+
+    @Override
+    public Integer importSubject(Map map) {
+        return leaderMapper.importSubject(map);
+    }
+
+    @Override
+    public Integer updateSubject(Map map) {
+        return leaderMapper.updateSubject(map);
+    }
+
+    @Override
+    public Integer deleteSubject(Integer id) {
+        return leaderMapper.deleteSubject(id);
+    }
+
+    @Override
+    public Integer getDepartIdBySubjectId(Integer id) {
+        return leaderMapper.getDepartIdBySubjectId(id);
     }
 }

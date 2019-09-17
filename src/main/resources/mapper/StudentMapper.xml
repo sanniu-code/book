@@ -28,10 +28,12 @@
     <select id="getSubjects" resultMap="Subjects">
         select tts.id as subject_id,tts.title,tts.detail,
                 tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
-                ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex  from t_teacher_subject tts
+                ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex
+                from t_teacher_subject tts
           left join t_teacher tt on tt.id = tts.teacherId
           left join t_student_subject tss on tts.id = tss.subjectId
           left join t_student ts on ts.username = tss.username
+          where tts.status = 1
     </select>
 
     <!--获取某个学生所报的课题的详情-->
@@ -66,9 +68,41 @@
     </insert>
 
 
-    <select id="getFilePath" parameterType="String" resultType="String">
-        select url from t_commonFile where name = #{fileName}
+    <!--判断用户的文件是否存在-->
+    <select id="isStore" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_student_file
+          where name = #{name} and url = #{url} and username = #{username}
     </select>
+
+    <!--用于更新-->
+    <update id="updatePath" parameterType="map" >
+        update t_student_file set url = #{url},createTime = #{createTime}
+        where username = #{username} and name = #{name}
+    </update>
+
+    <!--用于新增-->
+    <insert id="storePath" parameterType="map">
+        insert into t_student_file(username,name,url,createTime) values(
+          #{username},#{name},#{url},#{createTime}
+        )
+    </insert>
+
+    <select id="getReportPath" parameterType="map" resultType="String">
+        select url from t_teacher_file where username = #{username} and name = #{name}
+    </select>
+
+    <select id="getStudentInfo" parameterType="String" resultType="cn.duansanniu.entity.Student">
+        select username,name,sex,createTime from t_student where username = #{username}
+    </select>
+
+    <select id="getStudentFilePath" parameterType="map" resultType="String">
+        select url from t_student_file where username = #{username} and name = #{name}
+    </select>
+
+    <select id="getFailExamineFile" parameterType="String" resultType="cn.duansanniu.entity.StudentUploadFile">
+        select * from t_student_file where username = #{username} and status = 2;
+    </select>
+
 
 
 

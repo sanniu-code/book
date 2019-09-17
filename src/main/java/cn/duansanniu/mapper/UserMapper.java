@@ -20,4 +20,6 @@ public interface UserMapper {
     public Map teacherLogin(User user);
 
     public Map leaderLogin(User user);
+
+    public String getFilePath(String fileName);
 }

@@ -14,13 +14,17 @@
           where ts.username = #{username} and ts.password = #{password}
     </select>
 
-    <select id="teacherLogin" parameterType="cn.duansanniu.entity.User" resultType="cn.duansanniu.entity.Teacher">
+    <select id="teacherLogin" parameterType="cn.duansanniu.entity.User" resultType="map">
         select tt.*,td.name departName from t_teacher tt
           left join t_depart td  on td.id = tt.departId
           where tt.username = #{username} and tt.password = #{password}
     </select>
 
-    <select id="leaderLogin" parameterType="cn.duansanniu.entity.User" resultType="cn.duansanniu.entity.Leader">
+    <select id="leaderLogin" parameterType="cn.duansanniu.entity.User" resultType="map">
         select * from t_leader where username = #{username} and password = #{password}
+    </select>
+
+    <select id="getFilePath" parameterType="String" resultType="String">
+        select url from t_commonFile where name = #{fileName}
     </select>
 </mapper>

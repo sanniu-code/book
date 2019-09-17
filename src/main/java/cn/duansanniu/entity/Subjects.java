@@ -13,13 +13,15 @@ public class Subjects {
     private Integer id;
     private String title;
     private String detail;
+    private String type;
     private Teacher teacher;
     private Student student;
 
-    public Subjects(Integer id, String title, String detail, Teacher teacher, Student student) {
+    public Subjects(Integer id, String title, String detail, String type, Teacher teacher, Student student) {
         this.id = id;
         this.title = title;
         this.detail = detail;
+        this.type = type;
         this.teacher = teacher;
         this.student = student;
     }

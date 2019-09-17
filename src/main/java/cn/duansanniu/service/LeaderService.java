@@ -1,5 +1,8 @@
 package cn.duansanniu.service;
 
+import cn.duansanniu.entity.Teacher;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,4 +12,14 @@ import java.util.Map;
 public interface LeaderService {
 
     public Integer preserveCommonFileInfo(Map map);
+
+    public List<Teacher> getTeachersByDepartId(Integer id);
+
+    public Integer importSubject(Map map);
+
+    public Integer updateSubject(Map map);
+
+    public Integer deleteSubject(Integer id);
+
+    public Integer getDepartIdBySubjectId(Integer id);
 }

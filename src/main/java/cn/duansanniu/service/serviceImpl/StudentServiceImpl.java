@@ -1,6 +1,7 @@
 package cn.duansanniu.service.serviceImpl;
 
 import cn.duansanniu.entity.Student;
+import cn.duansanniu.entity.StudentUploadFile;
 import cn.duansanniu.entity.Subjects;
 import cn.duansanniu.mapper.StudentMapper;
 import cn.duansanniu.service.StudentService;
@@ -43,9 +44,48 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public String getFilePath(String fileName) {
+    public Integer storePath(Map map) {
 
+        //判断 是否已经存在
+        Integer num = studentMapper.isStore(map);
+        Integer flag = 0;
+        if(num >= 1){
+            //更新
+            flag = studentMapper.updatePath(map);
+        }else {
+            //保存
+            flag = studentMapper.storePath(map);
 
-        return studentMapper.getFilePath(fileName);
+        }
+
+        return flag;
+    }
+
+    /**
+     * 用于获取开题报告的文件路径
+     * @param map
+     * @return
+     */
+    @Override
+    public String getMissionBookPath(Map map) {
+        //String url = studentMapper.getPath(map);
+        return studentMapper.getMissionBookPath(map);
+    }
+
+    @Override
+    public Student getStudentInfo(String username) {
+
+        return studentMapper.getStudentInfo(username);
+    }
+
+    @Override
+    public String getStudentFilePath(Map map) {
+
+        return studentMapper.getStudentFilePath(map);
+    }
+
+    @Override
+    public List<StudentUploadFile> getFailExamineFile(String username) {
+        return studentMapper.getFailExamineFile(username);
     }
 }

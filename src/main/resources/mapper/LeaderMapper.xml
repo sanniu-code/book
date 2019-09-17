@@ -16,4 +16,44 @@
           where name = #{name} and url=#{url}
 
     </update>
+
+
+    <select id="getTeachersByDepartId" parameterType="Integer" resultType="cn.duansanniu.entity.Teacher">
+        select  username,name,sex,professionRank,degree from t_teacher where departId = #{id}
+    </select>
+
+    <insert id="importSubject" parameterType="map" >
+        insert into t_teacher_subject(username,title,detail,type) values(
+          #{username},#{title},#{detail},#{type}
+        )
+    </insert>
+
+    <update id="updateSubject" parameterType="map">
+        update t_teacher_subject
+        <set>
+            <if test="username!= null and username != ''">
+                 username = #{username},
+            </if>
+            <if test="title!= null and username!= ''">
+                 title = #{title},
+            </if>
+            <if test="detail!= null and detail!= ''">
+                 detail = #{detail},
+            </if>
+            <if test="type!= null and type != ''">
+                type = #{type}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSubject" parameterType="Integer">
+        delete from t_teacher_subject where id = #{id}
+    </delete>
+
+    <select id="getDepartIdBySubjectId" parameterType="Integer" resultType="Integer">
+        select departId from t_teacher tt
+          left join t_teacher_subject tts on tts.username = tt.username
+          where tts.id = #{id}
+    </select>
 </mapper>

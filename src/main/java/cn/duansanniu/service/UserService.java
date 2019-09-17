@@ -11,5 +11,7 @@ import java.util.Map;
 public interface UserService {
     public Map login(User user);
 
+    public String getFilePath(String fileName);
+
 
 }

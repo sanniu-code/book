@@ -39,4 +39,11 @@ public class UserServiceImpl implements UserService {
         return null;
 
     }
+
+    @Override
+    public String getFilePath(String fileName) {
+
+
+        return userMapper.getFilePath(fileName);
+    }
 }
