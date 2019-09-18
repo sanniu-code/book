@@ -67,6 +67,24 @@ public class UserController {
         }
     }
 
+
+    @GetMapping("loginOut")
+    @ResponseBody
+    @ApiOperation("退出登录")
+    public ResponseEntity loginOut(
+            HttpServletRequest request
+    ){
+        try{
+            HttpSession session = request.getSession();
+            session.removeAttribute("userInfo");
+            session.removeAttribute("type");
+            return new ResponseEntity(1,"退出成功",null);
+        }catch(Exception e){
+            return new ResponseEntity(0,"退出错误",null);
+        }
+    }
+
+
     /**
      * 有关常用表的下载
      */

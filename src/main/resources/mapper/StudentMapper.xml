@@ -103,7 +103,13 @@
         select * from t_student_file where username = #{username} and status = 2;
     </select>
 
+    <select id="getStudentStage" parameterType="String" resultType="Integer">
+        select status from t_student_subject where username = #{username}
+    </select>
 
+    <select id="getOwnMissionBook" parameterType="cn.duansanniu.entity.TeacherUploadFile" resultType="cn.duansanniu.entity.TeacherUploadFile">
+        select * from t_teacher_file where username = #{username} and name = #{name}
+    </select>
 
 
 </mapper>

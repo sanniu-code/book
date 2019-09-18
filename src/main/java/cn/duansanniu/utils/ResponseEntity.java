@@ -15,6 +15,8 @@ public class ResponseEntity  {
     /**
      * 1  获取数据成功
      * 0  获取数据失败
+     * 2  还没有登录
+     * 3  没权限
      */
     //返回值的状态码
     private Integer code;

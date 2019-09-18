@@ -3,6 +3,7 @@ package cn.duansanniu.mapper;
 import cn.duansanniu.entity.Student;
 import cn.duansanniu.entity.StudentUploadFile;
 import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.TeacherUploadFile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -38,6 +39,11 @@ public interface StudentMapper {
     public Student getStudentInfo(String username);
 
     public List<StudentUploadFile> getFailExamineFile(String username);
+
+    public Integer getStudentStage(String username);
+
+    public TeacherUploadFile getOwnMissionBook(TeacherUploadFile teacherUploadFile);
+
 
 
 

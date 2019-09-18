@@ -3,6 +3,7 @@ package cn.duansanniu.service.serviceImpl;
 import cn.duansanniu.entity.Student;
 import cn.duansanniu.entity.StudentUploadFile;
 import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.TeacherUploadFile;
 import cn.duansanniu.mapper.StudentMapper;
 import cn.duansanniu.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,4 +89,15 @@ public class StudentServiceImpl implements StudentService {
     public List<StudentUploadFile> getFailExamineFile(String username) {
         return studentMapper.getFailExamineFile(username);
     }
+
+    @Override
+    public Integer getStudentStage(String username) {
+        return studentMapper.getStudentStage(username);
+    }
+
+    @Override
+    public TeacherUploadFile getOwnMissionBook(TeacherUploadFile teacherUploadFile) {
+        return studentMapper.getOwnMissionBook(teacherUploadFile);
+    }
+
 }

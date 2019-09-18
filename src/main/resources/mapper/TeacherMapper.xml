@@ -41,5 +41,12 @@
           where tsf.status = 1 and tts.username = #{username}
     </select>
 
+    <select id="getStudentExamineFileCount" parameterType="String" resultType="Integer">
+        select ifnull(count(*),0) from t_student_file where username = #{username} and status = 1
+    </select>
+
+    <update id="updateStudentStage" parameterType="map">
+        update t_student_subject set status = #{count}  where username = #{username}
+    </update>
 </mapper>
 

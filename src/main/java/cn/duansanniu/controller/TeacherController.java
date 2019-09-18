@@ -128,7 +128,7 @@ public class TeacherController {
      */
     @ResponseBody
     @GetMapping("getNotExamineFiles")
-    @ApiOperation("获取还未审核通过的文件")
+    @ApiOperation("获取还未审核的文件")
     public ResponseEntity getNotExamineFiles(
             HttpServletRequest request
     ){
@@ -169,19 +169,32 @@ public class TeacherController {
 
 
     /**
-     * 审核学生上传的文件
+     * 通过学生上传的文件
      * @param studentUploadFile
      * @return
      */
     @ResponseBody
     @PostMapping("ExamineStudentUploadFile")
-    @ApiOperation("审核学生上传的文件")
+    @ApiOperation("通过学生上传的文件")
     public ResponseEntity examineStudentUploadFile(
             @RequestBody StudentUploadFile studentUploadFile
     ){
         try{
             Integer num = teacherService.examineStudentUploadFile(studentUploadFile);
             if(num <= 0) return new ResponseEntity(0,"修改失败",null);
+
+            //获取某个学生通过审核的文件个数
+            Integer count = teacherService.getStudentExamineFileCount(studentUploadFile.getStudent().getUsername());
+
+            //修改 某个学生处于哪个阶段
+            Map m = new HashMap();
+            m.put("username",studentUploadFile.getStudent().getUsername());
+            m.put("count",count+1);
+            Integer flag = teacherService.updateStudentStage(m);
+            if(flag <= 0) return new ResponseEntity(0,"修改失败",null);
+
+
+
             return new ResponseEntity(0,"修改成功",null);
         }catch (Exception e){
             return new ResponseEntity(0,"修改失败",null);
@@ -195,6 +208,7 @@ public class TeacherController {
      */
     @GetMapping("getExamineFiles")
     @ResponseBody
+    @ApiOperation("获取当前老师所有学生的上传的文件信息")
     public ResponseEntity getExamineFiles(
             HttpServletRequest request
     ){

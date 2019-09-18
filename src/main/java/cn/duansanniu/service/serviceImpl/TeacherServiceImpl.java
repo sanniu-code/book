@@ -51,4 +51,14 @@ public class TeacherServiceImpl implements TeacherService {
     public Integer failExamineStudentUploadFile(StudentUploadFile studentUploadFile) {
         return teacherMapper.failExamineStudentUploadFile(studentUploadFile);
     }
+
+    @Override
+    public Integer getStudentExamineFileCount(String username) {
+        return teacherMapper.getStudentExamineFileCount(username);
+    }
+
+    @Override
+    public Integer updateStudentStage(Map map) {
+        return teacherMapper.updateStudentStage(map);
+    }
 }

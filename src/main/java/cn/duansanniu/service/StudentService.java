@@ -3,6 +3,7 @@ package cn.duansanniu.service;
 import cn.duansanniu.entity.Student;
 import cn.duansanniu.entity.StudentUploadFile;
 import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.TeacherUploadFile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,14 @@ public interface StudentService {
     //获取学生上传表的文件的路径
     public String getStudentFilePath(Map map);
 
+    //获取审核未通过的文件
     public List<StudentUploadFile> getFailExamineFile(String username);
+
+    //获取当前学生所处的阶段
+    public Integer getStudentStage(String username);
+
+    public TeacherUploadFile getOwnMissionBook(TeacherUploadFile teacherUploadFile);
+
+
 
 }

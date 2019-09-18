@@ -3,6 +3,7 @@ package cn.duansanniu.controller;
 import cn.duansanniu.entity.Student;
 import cn.duansanniu.entity.StudentUploadFile;
 import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.TeacherUploadFile;
 import cn.duansanniu.service.StudentService;
 import cn.duansanniu.utils.DateUtils;
 import cn.duansanniu.utils.ResponseEntity;
@@ -155,6 +156,14 @@ public class StudentController {
             String year = dateUtils.getYear(map.get("createTime").toString());
             String fileName = null;
 
+            //获取当前学生 处于哪个阶段
+            Integer stage = studentService.getStudentStage(map.get("username").toString());
+            //stage 当前学生正处于的阶段
+            //type  要上传的文件的阶段
+            //这是权限问题
+            if(type > stage) return new ResponseEntity(2,"您还没有权限",null);
+
+
             /**
              * 1 开题报告
              * 2 中期报告
@@ -228,11 +237,11 @@ public class StudentController {
     /**
      * 用于下载开题任务书
      */
-    @GetMapping("downReport")
+    @GetMapping("downOwnMissionBook")
     @ResponseBody
-    @ApiOperation("用于下载开题要求")
+    @ApiOperation("用于下载开题任务书")
     @ApiImplicitParam(name = "fileName",value = "文件名字",required = true,paramType = "query")
-    public ResponseEntity downReport(
+    public ResponseEntity downOwnMissionBook(
             @RequestParam("fileName") String fileName,
             HttpServletRequest request,
             HttpServletResponse response
@@ -258,7 +267,36 @@ public class StudentController {
         }
     }
 
+    /**
+     * 获取自己的任务书
+     * @return
+     */
+    @GetMapping("getOwnMissionBook")
+    @ResponseBody
+    @ApiOperation("获取自己的任务书")
+    public ResponseEntity getOwnMissionBook(
+            HttpServletRequest request
+    ){
+        try{
+            Map map = (HashMap)request.getSession().getAttribute("userInfo");
+            String username = map.get("username").toString();
+            String name = "吕梁学院2016届毕业论文（设计）课题任务书 ————"+username+".doc";
+            TeacherUploadFile teacherUploadFile = new TeacherUploadFile();
+            teacherUploadFile.setName(name);
+            teacherUploadFile.setUsername(username);
+            TeacherUploadFile returnData = studentService.getOwnMissionBook(teacherUploadFile);
+            return new ResponseEntity(1,"获取成功",returnData);
+        }catch(Exception e){
+            return new ResponseEntity(0,"获取失败",null);
+        }
+    }
 
+
+    /**
+     * 获取未通过审核的消息
+     * @param request
+     * @return
+     */
     @GetMapping("getFailExamineFile")
     @ResponseBody
     @ApiOperation("获取未通过审核的消息")

@@ -25,4 +25,8 @@ public interface TeacherMapper {
 
     public Integer failExamineStudentUploadFile(StudentUploadFile studentUploadFile);
 
+    public Integer getStudentExamineFileCount(String username);
+
+    public Integer updateStudentStage(Map map);
+
 }
