@@ -17,12 +17,14 @@ import java.util.Map;
 public interface StudentService {
     public List<Subjects> getSubjects();
 
-    public Subjects getSubject(Student student);
+    public Subjects getSubject(String username);
 
     public Integer selectSubject(Map map);
 
     //保存学生上传的文件路径
     public Integer storePath(Map map);
+
+    public StudentUploadFile getStudentFileInfo(Map map);
 
     //获取开题任务书的路径
     public String getMissionBookPath(Map map);

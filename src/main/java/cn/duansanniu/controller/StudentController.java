@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLEncoder;
@@ -85,11 +86,16 @@ public class StudentController {
      * 获取这个用户所报的课题相关信息
      */
     @ResponseBody
-    @PostMapping("/getSubject")
+    @GetMapping("/getSubject")
     @ApiOperation(value = "获取当前用户所报课题的相关信息")
-    public ResponseEntity getSubject(@RequestBody Student student){
+    public ResponseEntity getSubject(
+            HttpServletRequest request
+    ){
         try{
-            Subjects subject = studentService.getSubject(student);
+            Map map = (HashMap)request.getSession().getAttribute("userInfo");
+            String username = map.get("username").toString();
+
+            Subjects subject = studentService.getSubject(username);
 
             return new ResponseEntity(1,"获取成功",subject);
         }catch (Exception e){
@@ -100,7 +106,7 @@ public class StudentController {
     /**
      * 学生 报课题
      */
-    @PostMapping("/selectSubject")
+    @GetMapping("/selectSubject")
     @ResponseBody
     @ApiOperation(value = "学生选择课题")
     @ApiImplicitParams({
@@ -231,6 +237,27 @@ public class StudentController {
             return new ResponseEntity(1,"下载成功",null);
         }catch(Exception e){
             return new ResponseEntity(0,"下载失败",null);
+        }
+    }
+
+    @GetMapping("/getStudentFileInfo")
+    @ResponseBody
+    @ApiOperation("获取用户上传的文件详情")
+    @ApiImplicitParam(name="fileName",value = "文件的名字",required = true,paramType = "query")
+    public ResponseEntity getStudentFileInfo(
+            @RequestParam("fileName") String fileName,
+            HttpServletRequest request
+    ){
+        try{
+            Map map = new HashMap();
+            Map m = (HashMap)request.getSession().getAttribute("userInfo");
+
+            map.put("username",m.get("username").toString());
+            map.put("fileName",fileName);
+            StudentUploadFile studentUploadFile = studentService.getStudentFileInfo(map);
+            return new ResponseEntity(1,"获取成功",studentUploadFile);
+        }catch(Exception e){
+            return new ResponseEntity(0,"获取失败",null);
         }
     }
 

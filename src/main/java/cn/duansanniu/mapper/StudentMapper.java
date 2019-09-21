@@ -17,11 +17,14 @@ import java.util.Map;
 public interface StudentMapper {
     public List<Subjects> getSubjects();
 
-    public Subjects getSubject(Student student);
+    public Subjects getSubject(String username);
 
     public Integer selectSubject(Map map);
 
     public Integer isSelect(Map map);
+
+    //判断某个学生的某个文件是否已经审核通过
+    public Integer isExamine(Map map);
 
     //保存学生上传的文件路径
     public Integer storePath(Map map);
@@ -43,6 +46,8 @@ public interface StudentMapper {
     public Integer getStudentStage(String username);
 
     public TeacherUploadFile getOwnMissionBook(TeacherUploadFile teacherUploadFile);
+
+    public StudentUploadFile getStudentFileInfo(Map map);
 
 
 

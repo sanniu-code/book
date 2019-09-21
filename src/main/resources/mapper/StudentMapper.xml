@@ -7,6 +7,7 @@
         <id property="id" column="subject_id"></id>
         <result property="title" column="title"/>
         <result property="detail" column="detail" />
+        <result property="type" column="type" />
         <association property="teacher" >
             <id property="id" column="teacher_id"/>
             <result property="username" column="teacher_username"/>
@@ -26,11 +27,11 @@
 
     <!--获取课题列表信息 -->
     <select id="getSubjects" resultMap="Subjects">
-        select tts.id as subject_id,tts.title,tts.detail,
+        select tts.id as subject_id,tts.title,tts.detail,tts.type,
                 tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
                 ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex
                 from t_teacher_subject tts
-          left join t_teacher tt on tt.id = tts.teacherId
+          left join t_teacher tt on tt.username = tts.username
           left join t_student_subject tss on tts.id = tss.subjectId
           left join t_student ts on ts.username = tss.username
           where tts.status = 1
@@ -38,21 +39,13 @@
 
     <!--获取某个学生所报的课题的详情-->
     <select id="getSubject" resultMap="Subjects" parameterType="cn.duansanniu.entity.Student">
-        select tts.id as subject_id,tts.title,tts.detail,
+        select tts.id as subject_id,tts.title,tts.detail,tts.type ,
                 tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
                 ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex  from t_teacher_subject tts
-          left join t_teacher tt on tt.id = tts.teacherId
+          left join t_teacher tt on tt.username = tts.username
           left join t_student_subject tss on tts.id = tss.subjectId
           left join t_student ts on ts.username = tss.username
-
-        <choose>
-            <when test="id!= null and id != 0">
-                where ts.id = #{id}
-            </when>
-            <when test="username!=null and username.length > 0">
-                where ts.username = #{username}
-            </when>
-        </choose>
+        where ts.username = #{username}
     </select>
 
     <!--判断某个学生已经选择了题 或者 这个题已经被别人选了-->
@@ -73,10 +66,15 @@
         select ifnull(count(*),0) from t_student_file
           where name = #{name} and url = #{url} and username = #{username}
     </select>
+    <!--是否已经通过审核-->
+    <select id="isExamine" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_student_file
+          where name = #{name} and url = #{url} and username = #{username} and status = 1
+    </select>
 
     <!--用于更新-->
     <update id="updatePath" parameterType="map" >
-        update t_student_file set url = #{url},createTime = #{createTime}
+        update t_student_file set url = #{url},createTime = #{createTime},status = 0
         where username = #{username} and name = #{name}
     </update>
 
@@ -87,7 +85,7 @@
         )
     </insert>
 
-    <select id="getReportPath" parameterType="map" resultType="String">
+    <select id="getMissionBookPath" parameterType="map" resultType="String">
         select url from t_teacher_file where username = #{username} and name = #{name}
     </select>
 
@@ -109,6 +107,10 @@
 
     <select id="getOwnMissionBook" parameterType="cn.duansanniu.entity.TeacherUploadFile" resultType="cn.duansanniu.entity.TeacherUploadFile">
         select * from t_teacher_file where username = #{username} and name = #{name}
+    </select>
+
+    <select id="getStudentFileInfo" parameterType="map" resultType="cn.duansanniu.entity.StudentUploadFile">
+        select * from t_student_file where username = #{username}  and name = #{fileName}
     </select>
 
 

@@ -30,8 +30,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Subjects getSubject(Student student) {
-        Subjects subject = studentMapper.getSubject(student);
+    public Subjects getSubject(String username) {
+        Subjects subject = studentMapper.getSubject(username);
         return subject;
     }
 
@@ -50,8 +50,16 @@ public class StudentServiceImpl implements StudentService {
         //判断 是否已经存在
         Integer num = studentMapper.isStore(map);
         Integer flag = 0;
-        if(num >= 1){
+
+        if(num >= 1){//存在
+            //判断是否已经审核通过
+            Integer isExamine = studentMapper.isExamine(map);
+            if(isExamine >= 1){
+                return 0;
+            }
+
             //更新
+
             flag = studentMapper.updatePath(map);
         }else {
             //保存
@@ -100,4 +108,8 @@ public class StudentServiceImpl implements StudentService {
         return studentMapper.getOwnMissionBook(teacherUploadFile);
     }
 
+    @Override
+    public StudentUploadFile getStudentFileInfo(Map map) {
+        return studentMapper.getStudentFileInfo(map);
+    }
 }
