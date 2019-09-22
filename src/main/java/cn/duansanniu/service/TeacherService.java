@@ -26,4 +26,6 @@ public interface TeacherService {
     public Integer getStudentExamineFileCount(String username);
 
     public Integer updateStudentStage(Map map);
+
+    public Integer storePath(Map map);
 }

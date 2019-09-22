@@ -1,15 +1,13 @@
 package cn.duansanniu.service.serviceImpl;
 
-import cn.duansanniu.entity.Leader;
-import cn.duansanniu.entity.Student;
-import cn.duansanniu.entity.Teacher;
-import cn.duansanniu.entity.User;
+import cn.duansanniu.entity.*;
 import cn.duansanniu.mapper.UserMapper;
 import cn.duansanniu.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,13 +24,19 @@ public class UserServiceImpl implements UserService {
     public Map login(User user) {
         switch (user.getType()){
             case 1:
-                return userMapper.studentLogin(user);
+                Map studentMap = userMapper.studentLogin(user);
+                studentMap.put("type",1);
+                return studentMap;
 
             case 2:
-                return userMapper.teacherLogin(user);
+                Map teacherMap = userMapper.teacherLogin(user);
+                teacherMap.put("type",2);
+                return teacherMap;
 
             case 3:
-                return userMapper.leaderLogin(user);
+                Map leaderMap = userMapper.leaderLogin(user);
+                leaderMap.put("type",3);
+                return leaderMap;
 
 
         }
@@ -45,5 +49,53 @@ public class UserServiceImpl implements UserService {
 
 
         return userMapper.getFilePath(fileName);
+    }
+
+    @Override
+    public List<CommonFile> getUserFileList() {
+        return userMapper.getUserFileList();
+    }
+
+
+    @Override
+    public Integer updatePass(Map map) {
+
+        if(!map.get("password").equals(map.get("repeatPass")))
+            return 0;
+
+        if((Integer)map.get("type") == 1){
+            return userMapper.updateStudentPass(map);
+        }else if((Integer)map.get("type") == 2){
+            return userMapper.updateStudentPass(map);
+        }else {
+            return userMapper.updateLeaderPass(map);
+        }
+    }
+
+    @Override
+    public Integer judgePass(Map map) {
+        if((Integer)map.get("type") == 1){
+            return userMapper.judgeStudentPass(map);
+        }else if((Integer)map.get("type") == 2){
+            return userMapper.judgeTeacherPass(map);
+        }else {
+            return userMapper.judgeLeaderPass(map);
+        }
+        //return userMapper.updateStudentPass(map);
+    }
+
+    @Override
+    public Task isEffectiveTask(Map map) {
+        return userMapper.isEffectiveTask(map);
+    }
+
+    @Override
+    public Integer getStudentDepartIdByUsername(String username) {
+        return userMapper.getStudentDepartIdByUsername(username);
+    }
+
+    @Override
+    public Integer getTeacherDepartIdByUsername(String username) {
+        return userMapper.getTeacherDepartIdByUsername(username);
     }
 }

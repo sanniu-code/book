@@ -7,13 +7,13 @@
     <select id="isGuideTeacher" parameterType="map" resultType="Integer">
         select ifnull(count(*),0) from t_student_subject tss
           left join t_teacher_subject tts on tts.id = tss.subjectId
-          where tss.username = #{username} and tts.teacherId = #{teacherId}
+          where tss.username = #{username} and tts.username = #{StuUsername}
     </select>
 
     <!--保存开题要求-->
     <insert id="storeReport" parameterType="map" >
-        insert into t_teacher_file(username,name,url,teacherId,createTime) values(
-          #{username},#{name},#{url},#{teacherId},#{createTime}
+        insert into t_teacher_file(username,name,url,createTime) values(
+          #{username},#{name},#{url},#{createTime}
         )
     </insert>
 
@@ -47,6 +47,30 @@
 
     <update id="updateStudentStage" parameterType="map">
         update t_student_subject set status = #{count}  where username = #{username}
+    </update>
+
+    <select id="isExitFile" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_teacher_file where name = #{name} and
+          username = #{username}
+    </select>
+
+    <insert id="storeFile" parameterType="map">
+        insert into t_teacher_file (username,name,url,createTime) values (
+          #{username},#{name},#{url},#{createTime}
+        )
+    </insert>
+
+    <update id="updateFile" parameterType="map">
+        update t_teacher_file
+        <set>
+            <if test="url!= null and url != ''">
+                 url = #{url}
+            </if>
+            <if test="createTime!=null and createTime!=''">
+                and createTime = #{createTime}
+            </if>
+        </set>
+        where username = #{username } and name = #{name}
     </update>
 </mapper>
 

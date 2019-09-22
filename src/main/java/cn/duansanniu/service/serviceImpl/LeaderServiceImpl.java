@@ -1,11 +1,13 @@
 package cn.duansanniu.service.serviceImpl;
 
+import cn.duansanniu.entity.Task;
 import cn.duansanniu.entity.Teacher;
 import cn.duansanniu.mapper.LeaderMapper;
 import cn.duansanniu.service.LeaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -61,5 +63,16 @@ public class LeaderServiceImpl implements LeaderService {
     @Override
     public Integer getDepartIdBySubjectId(Integer id) {
         return leaderMapper.getDepartIdBySubjectId(id);
+    }
+
+    @Override
+    public Integer createTask(Map map) {
+        //判断 这个系  当前是否存在 有效的任务
+        Date time = new Date();
+        map.put("time",time);
+        Integer num = leaderMapper.isEffectiveTask(map);
+        if(num <= 0)
+            return leaderMapper.createTask(map);
+        return 0;
     }
 }

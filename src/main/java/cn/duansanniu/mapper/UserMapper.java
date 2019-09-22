@@ -1,11 +1,9 @@
 package cn.duansanniu.mapper;
 
-import cn.duansanniu.entity.Leader;
-import cn.duansanniu.entity.Student;
-import cn.duansanniu.entity.Teacher;
-import cn.duansanniu.entity.User;
+import cn.duansanniu.entity.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,4 +20,26 @@ public interface UserMapper {
     public Map leaderLogin(User user);
 
     public String getFilePath(String fileName);
+
+    public List<CommonFile> getUserFileList();
+
+    public Integer updateTeacherPass(Map map);
+
+    public Integer updateStudentPass(Map map);
+
+    public Integer updateLeaderPass(Map map);
+
+    public Integer judgeStudentPass(Map map);
+
+    public Integer judgeTeacherPass(Map map);
+
+    public Integer judgeLeaderPass(Map map);
+//    判断当前是否存在 任务
+    public Task isEffectiveTask(Map map);
+    //通过用户名 获取这个用户对应的系id
+    public Integer getStudentDepartIdByUsername(String username);
+
+    public Integer getTeacherDepartIdByUsername(String username);
+
+
 }

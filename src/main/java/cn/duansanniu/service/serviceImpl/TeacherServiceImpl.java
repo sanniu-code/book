@@ -61,4 +61,17 @@ public class TeacherServiceImpl implements TeacherService {
     public Integer updateStudentStage(Map map) {
         return teacherMapper.updateStudentStage(map);
     }
+
+    @Override
+    public Integer storePath(Map map) {
+        //判断是否存在
+            //如果存在 就修改
+            //如果不存在 就新增
+        if(teacherMapper.isExitFile(map) <= 0){//不存在
+            return teacherMapper.storeFile(map);
+        }else {
+            return teacherMapper.updateFile(map);
+        }
+
+    }
 }

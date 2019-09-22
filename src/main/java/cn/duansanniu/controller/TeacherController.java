@@ -3,10 +3,13 @@ package cn.duansanniu.controller;
 import cn.duansanniu.entity.Student;
 import cn.duansanniu.entity.StudentUploadFile;
 import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.Task;
 import cn.duansanniu.service.StudentService;
 import cn.duansanniu.service.TeacherService;
+import cn.duansanniu.service.UserService;
 import cn.duansanniu.utils.ResponseEntity;
 import cn.duansanniu.utils.StudentFileUtils;
+import cn.duansanniu.utils.TeacherFileUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -36,10 +39,81 @@ import java.util.Map;
 public class TeacherController {
 
     @Autowired
+    private TeacherFileUtils teacherFileUtils;
+
+    @Autowired
     private TeacherService teacherService;
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private UserService userService;
+
+
+    /**
+     * 上传普通文件
+     */
+    @PostMapping("uploadFile")
+    @ResponseBody
+    @ApiOperation("上传普通文件")
+    @ApiImplicitParam(name = "type",value = "上传文件的类型",required = true,paramType = "query")
+    public ResponseEntity uploadFile(
+            MultipartFile file,
+            @RequestParam("type") Integer type,
+            HttpServletRequest request
+    ){
+        try{
+
+            //判断是否是指导老师
+            HttpSession session = request.getSession();
+            Map map = (HashMap)session.getAttribute("userInfo");
+            Integer teacherId = (Integer)map.get("id");
+
+            //封装了 指导老师 与 学生
+            Map dateMap = new HashMap();
+            dateMap.put("username",map.get("username").toString());
+            dateMap.put("teacherId",teacherId);
+
+            Integer num = teacherService.isGuideTeacher(dateMap);
+            //这个学生的知道老师 不是这个学生
+            if(num <= 0) return new ResponseEntity(0,"你好调皮",null);
+
+            /************** 上传文件  *****************************/
+            //上传的文件的名字
+            String name = file.getOriginalFilename();
+            //获取后缀名
+            String extendFileName = name.substring(name.lastIndexOf("."));
+
+            //上传的文件为空
+            if(file.isEmpty()) return new ResponseEntity(0,"你好调皮",null);
+
+            Integer departId = userService.getTeacherDepartIdByUsername(map.get("username").toString());
+            /* 获取年份开始 */
+            Map tempMap = new HashMap();
+            map.put("departId",departId);
+            map.put("time",new Date());
+            Task task = userService.isEffectiveTask(map);
+            if(task == null){
+                return null;
+            }
+            String year = task.getYear();
+            /* 获取年份结束 */
+
+            String newName = "吕梁学院"+year+"届毕业论文（设计）课题任务书 ————"+map.get("username").toString()+extendFileName;
+
+
+            Map finalMap =teacherFileUtils.teacherUpload(file,newName,map);
+
+            Integer flag = teacherService.storePath(finalMap);
+            if(flag <= 0) return new ResponseEntity(0,"上传失败",null);
+
+            return new ResponseEntity(1,"上传成功",null);
+
+        }catch(Exception e){
+            return new ResponseEntity(0,"上传失败",null);
+        }
+    }
 
 
     /**
@@ -59,18 +133,30 @@ public class TeacherController {
             //判断是否是指导老师
             HttpSession session = request.getSession();
             Map map = (HashMap)session.getAttribute("userInfo");
-            Integer teacherId = (Integer)map.get("id");
+            String StuUsername = (String)map.get("username");
 
             //封装了 指导老师 与 学生
             Map dateMap = new HashMap();
             dateMap.put("username",username);
-            dateMap.put("teacherId",teacherId);
+            dateMap.put("StuUsername",StuUsername);
 
             Integer num = teacherService.isGuideTeacher(dateMap);
             //这个学生的知道老师 不是这个学生
             if(num <= 0) return new ResponseEntity(0,"你好调皮",null);
 
             /************** 上传文件  *****************************/
+            /* 获取年份开始 */
+            Integer departId = userService.getTeacherDepartIdByUsername(map.get("username").toString());
+            Map tempMap = new HashMap();
+            map.put("departId",departId);
+            map.put("time",new Date());
+            Task task = userService.isEffectiveTask(map);
+            if(task == null){
+                return null;
+            }
+            String year = task.getYear();
+            /* 获取年份结束 */
+
             //上传的文件的名字
             String name = file.getOriginalFilename();
             //获取后缀名
@@ -85,19 +171,23 @@ public class TeacherController {
             if(!f.exists()) f = new File("");
 
             //获取 teacherFile 路径
-            File teacherFile = new File(f.getAbsolutePath(),"static/teacherFile/");
+            File teacherFile = new File(f.getAbsolutePath(),"static/"+File.separator+year);
             if(!teacherFile.exists()) teacherFile.mkdirs();
 
             //获取这个学生的信息
-            Student student = studentService.getStudentInfo(username);
-            Date date = student.getCreateTime();
-            String year = new SimpleDateFormat("yyyy").format(date);
+//            Student student = studentService.getStudentInfo(username);
+//            Date date = student.getCreateTime();
+//            String year = new SimpleDateFormat("yyyy").format(date);
 
+            String url = File.separator+map.get("departName")+File.separator+"teacherFile"+File.separator+map.get("username")+File.separator;
+
+            File tempFile = new File(teacherFile.getAbsolutePath(), url+ File.separator );
+            if(!tempFile.exists()) tempFile.mkdirs();
 
             //文件的新名字
             String newName = "吕梁学院"+year+"届毕业论文（设计）课题任务书 ————"+username+extendFileName;
             //最终的文件路径
-            File finalFile = new File(teacherFile.getPath() + File.separator +newName );
+            File finalFile = new File(tempFile.getAbsolutePath(), newName );
             //转存
             file.transferTo(finalFile);
 
@@ -106,7 +196,7 @@ public class TeacherController {
             finalMap.put("username",username);
             finalMap.put("name",newName);
             finalMap.put("url",finalFile.getPath());
-            finalMap.put("teacherId",teacherId);
+//            finalMap.put("teacherId",teacherId);
             finalMap.put("createTime",new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()));
 
 

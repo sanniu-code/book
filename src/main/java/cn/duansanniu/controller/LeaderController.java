@@ -1,6 +1,7 @@
 package cn.duansanniu.controller;
 
 import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.Task;
 import cn.duansanniu.entity.Teacher;
 import cn.duansanniu.service.LeaderService;
 import cn.duansanniu.utils.ResponseEntity;
@@ -176,6 +177,41 @@ public class LeaderController {
             return new ResponseEntity(1,"删除成功",null);
         }catch(Exception e){
             return new ResponseEntity(0,"删除失败",null);
+        }
+    }
+
+    @PostMapping("/createTask")
+    @ResponseBody
+    @ApiOperation("创建任务")
+    public ResponseEntity createTask(
+           @RequestBody Task task,
+           HttpServletRequest request
+    ){
+        try{
+            Map userInfoMap = (HashMap)request.getSession().getAttribute("userInfo");
+            Map map = new HashMap();
+            map.put("name",task.getName());
+            map.put("year",task.getYear());
+            map.put("departId",userInfoMap.get("departId").toString());
+            map.put("startTime",task.getStartTime());
+            map.put("endTime",task.getEndTime());
+            Integer num = leaderService.createTask(map);
+
+            if(num <= 0)
+                return new ResponseEntity(0,"创建失败",null);
+
+            //创建year 文件夹
+            File root = new File(ResourceUtils.getFile("classpath:").getPath());
+            if(!root.exists())
+                root = new File("");
+            //获取studentFile文件
+            File studentFile = new File(root.getAbsolutePath(),"static/"+task.getYear()+File.separator);
+            if(!studentFile.exists())
+                studentFile.mkdirs();
+
+            return new ResponseEntity(1,"创建成功",null);
+        }catch(Exception e){
+            return new ResponseEntity(0,"创建失败",null);
         }
     }
 

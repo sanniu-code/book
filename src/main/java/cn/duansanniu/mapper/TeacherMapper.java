@@ -29,4 +29,10 @@ public interface TeacherMapper {
 
     public Integer updateStudentStage(Map map);
 
+    public Integer isExitFile(Map map);
+
+    public Integer storeFile(Map map);
+
+    public Integer updateFile(Map map);
+
 }

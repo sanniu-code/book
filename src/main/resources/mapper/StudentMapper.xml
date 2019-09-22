@@ -98,7 +98,7 @@
     </select>
 
     <select id="getFailExamineFile" parameterType="String" resultType="cn.duansanniu.entity.StudentUploadFile">
-        select * from t_student_file where username = #{username} and status = 2;
+        select * from t_student_file where username = #{username} and status = 2 or status = 0;
     </select>
 
     <select id="getStudentStage" parameterType="String" resultType="Integer">

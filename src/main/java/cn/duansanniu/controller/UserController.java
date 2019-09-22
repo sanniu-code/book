@@ -1,6 +1,7 @@
 package cn.duansanniu.controller;
 
 import cn.duansanniu.entity.*;
+import cn.duansanniu.service.LeaderService;
 import cn.duansanniu.service.UserService;
 import cn.duansanniu.utils.ResponseEntity;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
@@ -22,6 +23,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLEncoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +44,7 @@ public class UserController {
     @Autowired
     private DefaultKaptcha captchaProducer;
 
+
     @PostMapping("/login")
     @ResponseBody
     @ApiOperation(value = "用于用户登录的")
@@ -49,10 +54,36 @@ public class UserController {
     ){
         try{
             //登录检查
-
             if(user.getPassword().length() == 0 || user.getUsername().length() == 0
                 || user.getCode().length() == 0 || user.getType() == null
             ) return new ResponseEntity(0,"请完善数据",null);
+
+            //判断这个用户的系是否存在有效的任务
+            //获取这个用户对象的信息
+
+            if(user.getType() == 1 || user.getType() == 2){
+                Integer departId = 0;
+                if(user.getType() == 1){
+                    departId = userService.getStudentDepartIdByUsername(user.getUsername());
+                }else {
+                    departId = userService.getTeacherDepartIdByUsername(user.getUsername());
+                }
+
+                if(departId <= 0){
+                    return new ResponseEntity(0,"账号错误",null);
+                }
+                Map map = new HashMap();
+                map.put("departId",departId);
+                map.put("time",new Date());
+                Task task = userService.isEffectiveTask(map);
+                if(task == null){
+                    return new ResponseEntity(2,"您还没有权限",null);
+                }
+            }
+
+
+
+
 
             String code = request.getSession().getAttribute("vrifyCode").toString();
             //验证码验证
@@ -127,6 +158,20 @@ public class UserController {
         }
     }
 
+
+    @GetMapping("/getUserFileList")
+    @ResponseBody
+    @ApiOperation("获取用户的常用文件列表")
+    public ResponseEntity getUserFileList(){
+        try{
+            List<CommonFile> list = userService.getUserFileList();
+            return new ResponseEntity(1,"获取成功",list);
+
+        }catch(Exception e){
+            return new ResponseEntity(0,"获取失败",null);
+        }
+    }
+
     /**
      * 验证码获取
      * @param response
@@ -168,6 +213,90 @@ public class UserController {
 
         }
     }
+
+    @PostMapping("/updatePass")
+    @ResponseBody
+    @ApiOperation("修改用户密码")
+    public ResponseEntity updatePass(
+        @RequestBody Map map,
+        HttpServletRequest request
+    ){
+        try{
+            HttpSession session = request.getSession();
+            Map m = (HashMap)session.getAttribute("userInfo");
+            String username = m.get("username").toString();
+
+            if( map.get("oldPass") == null || map.get("password") == null ||
+                map.get("repeatPass") == null || map.get("type") == null
+            ){
+                return new ResponseEntity(0,"修改密码失败",null);
+            }
+            map.put("username",username);
+            map.put("type",(Integer)m.get("type"));
+
+            //查看这个原密码是否正确
+            Integer flag = userService.judgePass(map);
+            if(flag <= 0)
+                return new ResponseEntity(0,"密码修改失败",null);
+            Integer num = userService.updatePass(map);
+            if(num <= 0)
+                return new ResponseEntity(0,"密码修改失败",null);
+            return new ResponseEntity(1,"密码修改成功",null);
+
+
+        }catch (Exception e){
+            return new ResponseEntity(0,"密码修改失败",null);
+        }
+    }
+
+
+    @PostMapping("/judgePass")
+    @ResponseBody
+    @ApiOperation("修改密码时 判断用户输入的原密码是否正确")
+    public ResponseEntity judgePass(
+            @RequestBody  Map map,
+            HttpServletRequest request
+    ){
+        try{
+            Map userMap = (HashMap)request.getSession().getAttribute("userInfo");
+            map.put("username",userMap.get("username").toString());
+            map.put("type",(Integer)userMap.get("type"));
+            Integer num = userService.judgePass(map);
+            if(num <= 0)
+                return  new ResponseEntity(0,"网络异常",null);
+            return new ResponseEntity(1,"查询成功",null);
+
+
+        }catch (Exception e){
+            return  new ResponseEntity(0,"网络异常",null);
+        }
+    }
+
+//    @GetMapping("/getUserTaskInfo")
+//    @ResponseBody
+//    public ResponseEntity getUserTaskInfo(
+//            HttpServletRequest request
+//    ){
+//        try{
+//            Map map = (HashMap)request.getSession().getAttribute("userInfo");
+//            Integer departId = userService.getStudentDepartIdByUsername(map.get("username").toString());
+//            if(departId <= 0){
+//                return new ResponseEntity(0,"账号错误",null);
+//            }
+//            Map tempMap = new HashMap();
+//            tempMap.put("departId",departId);
+//            tempMap.put("time",new Date());
+//            Task task = userService.isEffectiveTask(map);
+//            if(task == null){
+//                return new ResponseEntity(2,"您还没有权限",null);
+//            }
+//            return new ResponseEntity(2,"您还没有权限",null);
+//
+//
+//        }catch(Exception e){
+//
+//        }
+//    }
 
 
 

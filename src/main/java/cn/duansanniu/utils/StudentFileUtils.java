@@ -1,5 +1,7 @@
 package cn.duansanniu.utils;
 
+import cn.duansanniu.entity.Task;
+import cn.duansanniu.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
@@ -27,6 +29,11 @@ public class StudentFileUtils {
     @Autowired
     private DateUtils dateUtils;
 
+    @Autowired
+    private UserService userService;
+
+
+
     /**
      *
      * @param file 上传的文件
@@ -36,6 +43,20 @@ public class StudentFileUtils {
      */
     public Map studentUpload(MultipartFile file, String fileName, Map map){
         try{
+
+            //获取用户的任务信息
+            Integer departId = userService.getStudentDepartIdByUsername(map.get("username").toString());
+            if(departId <= 0){
+                return null;
+            }
+            Map tempMap = new HashMap();
+            tempMap.put("departId",departId);
+            tempMap.put("time",new Date());
+            Task task = userService.isEffectiveTask(tempMap);
+            //这个任务的year
+            String year = task.getYear();
+
+
             //获取文件名字
             String name = file.getOriginalFilename();
             //后缀名
@@ -45,14 +66,14 @@ public class StudentFileUtils {
             if(!root.exists())
                 root = new File("");
             //获取studentFile文件
-            File studentFile = new File(root.getAbsolutePath(),"static/studentFile/");
+            File studentFile = new File(root.getAbsolutePath(),"static/"+year+File.separator);
             if(!studentFile.exists())
                 studentFile.mkdirs();
 
             //获取学生入学年份
-            String year = dateUtils.getYear(map.get("createTime").toString());
+//            String year = dateUtils.getYear(map.get("createTime").toString());
 
-            String url = year+File.separator+map.get("departName")+File.separator+map.get("professionName")+File.separator+map.get("className")+File.separator+map.get("username")+File.separator;
+            String url = File.separator+map.get("departName")+File.separator+"studentFile"+File.separator+map.get("professionName")+File.separator+map.get("className")+File.separator+map.get("username")+File.separator;
 
             //生成年文件夹
             File yearFile = new File(studentFile.getAbsolutePath(),url);

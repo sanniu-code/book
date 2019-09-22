@@ -1,5 +1,6 @@
 package cn.duansanniu.service;
 
+import cn.duansanniu.entity.Task;
 import cn.duansanniu.entity.Teacher;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface LeaderService {
     public Integer deleteSubject(Integer id);
 
     public Integer getDepartIdBySubjectId(Integer id);
+
+    public Integer createTask(Map map);
 }

@@ -1,5 +1,6 @@
 package cn.duansanniu.mapper;
 
+import cn.duansanniu.entity.Task;
 import cn.duansanniu.entity.Teacher;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +28,8 @@ public interface LeaderMapper {
     public Integer deleteSubject(Integer id);
 
     public Integer getDepartIdBySubjectId(Integer id);
+
+    public Integer createTask(Map map);
+
+    public Integer isEffectiveTask(Map map);
 }

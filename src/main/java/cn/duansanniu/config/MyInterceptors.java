@@ -19,6 +19,8 @@ import javax.servlet.http.HttpSession;
 @Component
 public class MyInterceptors implements HandlerInterceptor {
 
+
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
@@ -42,6 +44,7 @@ public class MyInterceptors implements HandlerInterceptor {
         Integer type = (Integer)session.getAttribute("type");
         switch(type){
             case 1:
+
                 if(uri.startsWith("/student")) return true;
 
                 response.getWriter().print(noShiro);

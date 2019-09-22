@@ -7,7 +7,7 @@
 
 
     <select id="studentLogin" parameterType="cn.duansanniu.entity.User" resultType="map">
-        select ts.*,tc.name className,tp.name professionName,td.name departName  from t_student ts
+        select ts.id,ts.username,ts.name,ts.sex,ts.classid,ts.createTime,ts.status,tc.name className,tp.name professionName,td.name departName  from t_student ts
           left join t_class  tc on tc.id = ts.classid
           left join t_profession tp on tp.id = tc.professionid
           left join t_depart td on td.id = tp.departId
@@ -15,16 +15,63 @@
     </select>
 
     <select id="teacherLogin" parameterType="cn.duansanniu.entity.User" resultType="map">
-        select tt.*,td.name departName from t_teacher tt
+        select tt.id,tt.username,tt.name,tt.sex,tt.professionRank,tt.degree,tt.departId,tt.status,td.name departName from t_teacher tt
           left join t_depart td  on td.id = tt.departId
           where tt.username = #{username} and tt.password = #{password}
     </select>
 
     <select id="leaderLogin" parameterType="cn.duansanniu.entity.User" resultType="map">
-        select * from t_leader where username = #{username} and password = #{password}
+        select id,username,name,departId from t_leader where username = #{username} and password = #{password}
     </select>
 
     <select id="getFilePath" parameterType="String" resultType="String">
         select url from t_commonFile where name = #{fileName}
     </select>
+
+    <select id="getUserFileList" resultType="cn.duansanniu.entity.CommonFile">
+        select * from t_common_file ;
+    </select>
+
+    <update id="updateStudentPass" parameterType="map">
+        update t_student set password = #{password} where username = #{username}
+    </update>
+
+    <update id="updateTeacherPass" parameterType="map">
+        update t_teacher set password = #{password} where username = #{username}
+    </update>
+
+    <update id="updateLeaderPass" parameterType="map">
+        update t_leader set password = #{password} where username = #{username}
+    </update>
+
+    <select id="judgeStudentPass" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_student where username = #{username} and password = #{oldPass}
+    </select>
+
+    <select id="judgeTeacherPass" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_teacher where username = #{username} and password = #{oldPass}
+    </select>
+
+    <select id="judgeLeaderPass" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_leader where username = #{username} and password = #{oldPass}
+    </select>
+
+    <select id="isEffectiveTask" parameterType="map" resultType="cn.duansanniu.entity.Task">
+        select * from t_task where departId = #{departId}
+          and unix_timestamp(endTime) &gt; unix_timestamp(#{time})
+          and unix_timestamp(startTime) &lt; unix_timestamp(#{time})
+    </select>
+
+    <select id="getStudentDepartIdByUsername" parameterType="String" resultType="Integer">
+        select ifnull(departId,0) from t_profession tp
+          left join t_class tc on tc.professionid = tp.id
+          left join t_student ts on ts.classid = tc.id
+          where ts.username = #{username}
+    </select>
+
+    <select id="getTeacherDepartIdByUsername" parameterType="String" resultType="Integer">
+        select ifnull(departId,0) from t_teacher where username = #{username}
+
+    </select>
+
 </mapper>

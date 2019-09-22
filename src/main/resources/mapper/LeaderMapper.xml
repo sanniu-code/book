@@ -56,4 +56,14 @@
           left join t_teacher_subject tts on tts.username = tt.username
           where tts.id = #{id}
     </select>
+
+    <select id="isEffectiveTask" parameterType="map" resultType="Integer">
+        select ifnull(count(*),0) from t_task where departId = #{departId}
+          and unix_timestamp(endTime) &gt; unix_timestamp(#{time})
+          and unix_timestamp(startTime) &lt; unix_timestamp(#{time})
+    </select>
+
+    <insert id="createTask" parameterType="map" >
+        insert  into t_task(name,departId,year,startTime,endTime) values (#{name},#{departId},#{year},#{startTime},#{endTime})
+    </insert>
 </mapper>
