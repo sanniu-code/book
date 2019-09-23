@@ -8,6 +8,9 @@
         <result property="title" column="title"/>
         <result property="detail" column="detail" />
         <result property="type" column="type" />
+        <result property="origin" column="origin"/>
+        <result property="address" column="address"/>
+
         <association property="teacher" >
             <id property="id" column="teacher_id"/>
             <result property="username" column="teacher_username"/>
@@ -27,7 +30,7 @@
 
     <!--获取课题列表信息 -->
     <select id="getSubjects" resultMap="Subjects">
-        select tts.id as subject_id,tts.title,tts.detail,tts.type,
+        select tts.id as subject_id,tts.title,tts.detail,tts.type,tts.origin,tts.address,
                 tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
                 ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex
                 from t_teacher_subject tts
@@ -39,7 +42,7 @@
 
     <!--获取某个学生所报的课题的详情-->
     <select id="getSubject" resultMap="Subjects" parameterType="cn.duansanniu.entity.Student">
-        select tts.id as subject_id,tts.title,tts.detail,tts.type ,
+        select tts.id as subject_id,tts.title,tts.detail,tts.type ,tts.origin,tts.address,
                 tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
                 ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex  from t_teacher_subject tts
           left join t_teacher tt on tt.username = tts.username
@@ -64,29 +67,29 @@
     <!--判断用户的文件是否存在-->
     <select id="isStore" parameterType="map" resultType="Integer">
         select ifnull(count(*),0) from t_student_file
-          where name = #{name} and url = #{url} and username = #{username}
+          where type = #{type} and username = #{username}
     </select>
     <!--是否已经通过审核-->
     <select id="isExamine" parameterType="map" resultType="Integer">
         select ifnull(count(*),0) from t_student_file
-          where name = #{name} and url = #{url} and username = #{username} and status = 1
+          where type = #{type} and username = #{username} and status = 1
     </select>
 
     <!--用于更新-->
     <update id="updatePath" parameterType="map" >
-        update t_student_file set url = #{url},createTime = #{createTime},status = 0
-        where username = #{username} and name = #{name}
+        update t_student_file set url = #{url},createTime = #{createTime},name = #{name},status = 0
+        where username = #{username} and type = #{type}
     </update>
 
     <!--用于新增-->
     <insert id="storePath" parameterType="map">
-        insert into t_student_file(username,name,url,createTime) values(
-          #{username},#{name},#{url},#{createTime}
+        insert into t_student_file(username,name,url,createTime,status,type) values(
+          #{username},#{name},#{url},#{createTime},0,#{type}
         )
     </insert>
 
-    <select id="getMissionBookPath" parameterType="map" resultType="String">
-        select url from t_teacher_file where username = #{username} and name = #{name}
+    <select id="getMissionBookPath" parameterType="cn.duansanniu.entity.TeacherUploadFile" resultType="String">
+        select url from t_teacher_file where studentusername = #{username} and fileType = #{type}
     </select>
 
     <select id="getStudentInfo" parameterType="String" resultType="cn.duansanniu.entity.Student">
@@ -94,7 +97,7 @@
     </select>
 
     <select id="getStudentFilePath" parameterType="map" resultType="String">
-        select url from t_student_file where username = #{username} and name = #{name}
+        select url from t_student_file where username = #{username} and type = #{type}
     </select>
 
     <select id="getFailExamineFile" parameterType="String" resultType="cn.duansanniu.entity.StudentUploadFile">
@@ -106,11 +109,22 @@
     </select>
 
     <select id="getOwnMissionBook" parameterType="cn.duansanniu.entity.TeacherUploadFile" resultType="cn.duansanniu.entity.TeacherUploadFile">
-        select * from t_teacher_file where username = #{username} and name = #{name}
+        select * from t_teacher_file where username = #{username} and type = #{type}
     </select>
 
     <select id="getStudentFileInfo" parameterType="map" resultType="cn.duansanniu.entity.StudentUploadFile">
-        select * from t_student_file where username = #{username}  and name = #{fileName}
+        select * from t_student_file where username = #{username}  and type = #{type}
+    </select>
+
+    <update id="changeSubjectFileUsername" parameterType="map">
+        update  t_teacher_file set studentusername = #{studentusername}
+          where id in (
+            select fileId from t_teacher_subject where id = #{subjectId}
+          )
+    </update>
+
+    <select id="getTeacherUploadFile" parameterType="cn.duansanniu.entity.TeacherUploadFile" resultType="cn.duansanniu.entity.TeacherUploadFile">
+        select * from t_teacher_file where studentusername = #{username} and fileType = #{type}
     </select>
 
 

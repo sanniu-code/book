@@ -1,6 +1,9 @@
 package cn.duansanniu.service.serviceImpl;
 
+import cn.duansanniu.entity.ApplyTable;
+import cn.duansanniu.entity.StudentList;
 import cn.duansanniu.entity.StudentUploadFile;
+import cn.duansanniu.entity.Subjects;
 import cn.duansanniu.mapper.TeacherMapper;
 import cn.duansanniu.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,10 +71,51 @@ public class TeacherServiceImpl implements TeacherService {
             //如果存在 就修改
             //如果不存在 就新增
         if(teacherMapper.isExitFile(map) <= 0){//不存在
-            return teacherMapper.storeFile(map);
+            Integer num = teacherMapper.storeFile(map);
+            if(num <= 0){
+                return 0;
+            }
+            return num;
         }else {
-            return teacherMapper.updateFile(map);
+            Integer num = teacherMapper.updateFile(map);
+            if(num <= 0){
+                return 0;
+            }
+            //获取这条数据的id
+            Integer id = teacherMapper.getFileId(map);
+            return id;
         }
 
+    }
+
+
+    @Override
+    public Integer uploadApplyTable(ApplyTable applyTable) {
+        return teacherMapper.uploadApplyTable(applyTable);
+    }
+
+    @Override
+    public List<StudentList> getStudentList(String username) {
+        return teacherMapper.getStudentList(username);
+    }
+
+    @Override
+    public List<Subjects> getTeacherSubjects(String username) {
+        return teacherMapper.getTeacherSubjects(username);
+    }
+
+    @Override
+    public String getPathUrlByFileId(Integer id) {
+        return teacherMapper.getPathUrlByFileId(id);
+    }
+
+    @Override
+    public List<StudentUploadFile> getStudentFileInfo(Map map) {
+        return teacherMapper.getStudentFileInfo(map);
+    }
+
+    @Override
+    public Integer examineStudentFile(Map map) {
+        return teacherMapper.examineStudentFile(map);
     }
 }

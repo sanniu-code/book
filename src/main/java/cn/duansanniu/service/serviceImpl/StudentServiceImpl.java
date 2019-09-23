@@ -72,13 +72,13 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * 用于获取开题报告的文件路径
-     * @param map
+     * @param
      * @return
      */
     @Override
-    public String getMissionBookPath(Map map) {
+    public String getMissionBookPath(TeacherUploadFile teacherUploadFile) {
         //String url = studentMapper.getPath(map);
-        return studentMapper.getMissionBookPath(map);
+        return studentMapper.getMissionBookPath(teacherUploadFile);
     }
 
     @Override
@@ -104,12 +104,18 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public TeacherUploadFile getOwnMissionBook(TeacherUploadFile teacherUploadFile) {
-        return studentMapper.getOwnMissionBook(teacherUploadFile);
+    public TeacherUploadFile getTeacherUploadFile(TeacherUploadFile teacherUploadFile) {
+        return studentMapper.getTeacherUploadFile(teacherUploadFile);
     }
 
     @Override
     public StudentUploadFile getStudentFileInfo(Map map) {
         return studentMapper.getStudentFileInfo(map);
+    }
+
+
+    @Override
+    public Integer changeSubjectFileUsername(Map map) {
+        return studentMapper.changeSubjectFileUsername(map);
     }
 }

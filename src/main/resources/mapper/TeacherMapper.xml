@@ -7,7 +7,7 @@
     <select id="isGuideTeacher" parameterType="map" resultType="Integer">
         select ifnull(count(*),0) from t_student_subject tss
           left join t_teacher_subject tts on tts.id = tss.subjectId
-          where tss.username = #{username} and tts.username = #{StuUsername}
+          where tss.username = #{studentusername} and tts.username = #{teacherUsername}
     </select>
 
     <!--保存开题要求-->
@@ -51,12 +51,12 @@
 
     <select id="isExitFile" parameterType="map" resultType="Integer">
         select ifnull(count(*),0) from t_teacher_file where name = #{name} and
-          username = #{username}
+          username = #{username} and fileType = #{fileType}
     </select>
 
-    <insert id="storeFile" parameterType="map">
-        insert into t_teacher_file (username,name,url,createTime) values (
-          #{username},#{name},#{url},#{createTime}
+    <insert id="storeFile" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into t_teacher_file (username,name,url,createTime,studentusername,fileType) values (
+          #{username},#{name},#{url},#{createTime},#{studentusername},#{fileType}
         )
     </insert>
 
@@ -64,13 +64,69 @@
         update t_teacher_file
         <set>
             <if test="url!= null and url != ''">
-                 url = #{url}
+                 url = #{url},
             </if>
             <if test="createTime!=null and createTime!=''">
-                and createTime = #{createTime}
+                 createTime = #{createTime}
             </if>
         </set>
-        where username = #{username } and name = #{name}
+        where username = #{username } and name = #{name} and fileType = #{fileType}
+    </update>
+    
+    <select id="getFileId" parameterType="map" resultType="Integer">
+        select id from t_teacher_file where username = #{username} and name = #{name} and fileType=#{fileType}
+          and url = #{url} and createTime = #{createTime}
+    </select>
+    
+    
+    <insert id="uploadApplyTable" parameterType="cn.duansanniu.entity.ApplyTable">
+        insert into t_teacher_subject values(null,#{username},#{title},#{detail},#{status},#{type},#{fileId},#{origin},#{address})
+    </insert>
+
+    <resultMap id="StudentList" type="cn.duansanniu.entity.StudentList">
+        <result column="username" property="username" />
+        <result column="name" property="name"/>
+        <result column="profession" property="profession"/>
+        <result column="className" property="className"/>
+        <result column="title" property="title"/>
+        <result column="detail" property="detail"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <select id="getStudentList" parameterType="String" resultMap="StudentList">
+
+
+        select ts.username,ts.name,tts.title,tts.detail,tss.status,tp.name profession,tc.name className from t_student ts
+          left join t_student_subject tss on tss.username = ts.username
+          left join t_teacher_subject tts on tts.id = tss.subjectId
+          left join t_class tc on tc.id = ts.classid
+          left join t_profession tp on tp.id = tc.professionid
+          where tts.username = #{username}
+
+
+
+    </select>
+
+    <select id="getTeacherSubjects" parameterType="String" resultType="cn.duansanniu.entity.Subjects">
+        select * from t_teacher_subject where username = #{username}
+    </select>
+
+    <select id="getPathUrlByFileId" parameterType="Integer" resultType="String">
+        select ttf.url from t_teacher_file ttf
+        left join t_teacher_subject tts on tts.fileId = ttf.id
+        where tts.id = #{id}
+
+    </select>
+
+    <select id="getStudentFileInfo" parameterType="map" resultType="cn.duansanniu.entity.StudentUploadFile">
+        select tsf.* from t_student_file tsf
+        left join t_student_subject tss on tss.username = tsf.username
+        left join t_teacher_subject tts on tts.id = tss.subjectId
+        where tsf.type = #{type} and tts.username = #{username}
+    </select>
+
+    <update id="examineStudentFile" parameterType="map">
+        update t_student_file set status = #{status} where id = #{id}
     </update>
 </mapper>
 

@@ -16,14 +16,16 @@ public class TeacherUploadFile {
     private String username;
     private String name;
     private String url;
+    private Integer type;
     private Teacher teacher;
     private Date createTime;
 
-    public TeacherUploadFile(Integer id, String username, String name, String url, Teacher teacher, Date createTime) {
+    public TeacherUploadFile(Integer id, String username, String name, String url, Integer type, Teacher teacher, Date createTime) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.url = url;
+        this.type = type;
         this.teacher = teacher;
         this.createTime = createTime;
     }

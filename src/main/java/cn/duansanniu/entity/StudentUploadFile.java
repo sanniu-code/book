@@ -18,14 +18,16 @@ public class StudentUploadFile {
     private String url;
     private Date createTime;
     private Integer status;
+    private Integer type;
 
-    public StudentUploadFile(Integer id, Student student, String name, String url, Date createTime, Integer status) {
+    public StudentUploadFile(Integer id, Student student, String name, String url, Date createTime, Integer status, Integer type) {
         this.id = id;
         this.student = student;
         this.name = name;
         this.url = url;
         this.createTime = createTime;
         this.status = status;
+        this.type = type;
     }
 
     public StudentUploadFile() {

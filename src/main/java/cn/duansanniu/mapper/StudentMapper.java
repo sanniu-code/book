@@ -36,7 +36,7 @@ public interface StudentMapper {
     public String getStudentFilePath(Map map);
 
     //获取开题任务书文件的路径
-    public String getMissionBookPath(Map map);
+    public String getMissionBookPath(TeacherUploadFile teacherUploadFile);
 
     //获取某个学生的相关信息
     public Student getStudentInfo(String username);
@@ -45,9 +45,12 @@ public interface StudentMapper {
 
     public Integer getStudentStage(String username);
 
-    public TeacherUploadFile getOwnMissionBook(TeacherUploadFile teacherUploadFile);
+    public TeacherUploadFile getTeacherUploadFile(TeacherUploadFile teacherUploadFile);
 
     public StudentUploadFile getStudentFileInfo(Map map);
+
+
+    public Integer changeSubjectFileUsername(Map map);
 
 
 

@@ -1,6 +1,9 @@
 package cn.duansanniu.service;
 
+import cn.duansanniu.entity.ApplyTable;
+import cn.duansanniu.entity.StudentList;
 import cn.duansanniu.entity.StudentUploadFile;
+import cn.duansanniu.entity.Subjects;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -28,4 +31,17 @@ public interface TeacherService {
     public Integer updateStudentStage(Map map);
 
     public Integer storePath(Map map);
+
+    //
+    public Integer uploadApplyTable(ApplyTable applyTable);
+
+    public List<StudentList> getStudentList(String username);
+
+    public List<Subjects> getTeacherSubjects(String username);
+
+    public String getPathUrlByFileId(Integer id);
+
+    public List<StudentUploadFile> getStudentFileInfo(Map map);
+
+    public Integer examineStudentFile(Map map);
 }

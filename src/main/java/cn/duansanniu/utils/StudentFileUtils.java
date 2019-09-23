@@ -81,7 +81,7 @@ public class StudentFileUtils {
                 yearFile.mkdirs();
 
             //文件的上传
-            File finalFile = new File(yearFile.getPath()+File.separator+fileName+extendFileName);
+            File finalFile = new File(yearFile.getPath()+File.separator+fileName+"————"+map.get("username").toString()+extendFileName);
             file.transferTo(finalFile);
 
             Map returnMap = new HashMap();
@@ -111,12 +111,12 @@ public class StudentFileUtils {
             //获取文件流
             FileInputStream fileInputStream = new FileInputStream(file);
             //获取后缀名
-            String extendFileName = fileName.substring(fileName.lastIndexOf("."));
+            String extendFileName = url.substring(url.lastIndexOf("."));
 
             //动态设置响应类型 根据前台传递文件类型设置响应类型
             response.setContentType(request.getSession().getServletContext().getMimeType(extendFileName));
             //设置响应头,attachment表示以附件的形式下载，inline表示在线打开
-            response.setHeader("content-disposition","attachment;fileName="+ URLEncoder.encode(fileName,"UTF-8"));
+            response.setHeader("content-disposition","attachment;fileName="+ URLEncoder.encode(fileName+extendFileName,"UTF-8"));
             //获取输出流对象
             ServletOutputStream os = response.getOutputStream();
             //下载文件使用 spring框架中的FileCopyUtils工具

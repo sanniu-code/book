@@ -128,9 +128,18 @@ public class StudentController {
             //选题
             Integer num = studentService.selectSubject(map);
             if(num >= 1){
+                //选题成功后 就应该将课题申请表与学生进行绑定
+                Map tempMap = new HashMap();
+                tempMap.put("studentusername",username);
+                tempMap.put("subjectId",subjectId);
+                Integer tempNum = studentService.changeSubjectFileUsername(tempMap);
+                if(tempNum <=0 ){
+                    return new ResponseEntity(0,"选题失败",null);
+                }
+
                 return new ResponseEntity(1,"选题成功",null);
             }else {
-                return new ResponseEntity(0,"不可重复选择",null);
+                return new ResponseEntity(0,"选题失败",null);
             }
 
 
@@ -158,8 +167,9 @@ public class StudentController {
     ){
         try{
             Map map = (HashMap)request.getSession().getAttribute("userInfo");
-
-            String year = dateUtils.getYear(map.get("createTime").toString());
+            //获取任务的年份
+            //map.get("departId")
+            //String year = dateUtils.getYear(map.get("createTime").toString());
             String fileName = null;
 
             //获取当前学生 处于哪个阶段
@@ -179,10 +189,10 @@ public class StudentController {
              */
             switch(type){
                 case 1:
-                    fileName = "附件1 吕梁学院"+year+"届毕业论文（设计）开题报告";
+                    fileName = "毕业论文（设计）开题报告";
                     break;
                 case 2:
-                    fileName = "附件7 吕梁学院"+year+"届毕业论文（设计）中期报告";
+                    fileName = "毕业论文（设计）中期报告";
                     break;
                 case 3:
                     fileName = "格式查重报告";
@@ -199,6 +209,7 @@ public class StudentController {
 
 
             Map fileMap = studentFileUtils.studentUpload(file,fileName,map);
+            fileMap.put("type",type);
             Integer num = studentService.storePath(fileMap);
             if(num <= 0) return new ResponseEntity(0,"上传失败",null);
             return new ResponseEntity(1,"上传成功",null);
@@ -216,19 +227,37 @@ public class StudentController {
     @GetMapping("/downloadStudentFile")
     @ResponseBody
     @ApiOperation("学生文件的下载")
-    @ApiImplicitParam(name = "fileName",value = "文件的名字",required = true,paramType = "query")
+    @ApiImplicitParam(name = "type",value = "文件类型",required = true,paramType = "query")
     public ResponseEntity downloadStudentFile(
-            @RequestParam(value = "fileName") String fileName,
+            @RequestParam(value = "type") Integer type,
             HttpServletRequest request,
             HttpServletResponse response
     ){
         try{
+            String fileName = "";
+            switch(type){
+                case 1:
+                    fileName = "毕业论文（设计）开题报告";
+                    break;
+                case 2:
+                    fileName = "毕业论文（设计）中期报告";
+                    break;
+                case 3:
+                    fileName = "格式查重报告";
+                    break;
+                case 4:
+                    fileName = "论文查重率";
+                    break;
+                case 5:
+                    fileName = "论文";
+                    break;
+            }
 
             Map map = (HashMap)request.getSession().getAttribute("userInfo");
             String username = map.get("username").toString();
             Map dateMap = new HashMap();
             dateMap.put("username",username);
-            dateMap.put("name",fileName);
+            dateMap.put("type",type);
 
             //获取文件的路径
             String url = studentService.getStudentFilePath(dateMap);
@@ -240,20 +269,44 @@ public class StudentController {
         }
     }
 
+
     @GetMapping("/getStudentFileInfo")
     @ResponseBody
     @ApiOperation("获取用户上传的文件详情")
-    @ApiImplicitParam(name="fileName",value = "文件的名字",required = true,paramType = "query")
+    @ApiImplicitParam(name="type",value = "文件类型",required = true,paramType = "query")
     public ResponseEntity getStudentFileInfo(
-            @RequestParam("fileName") String fileName,
+            @RequestParam("type") Integer type,
             HttpServletRequest request
     ){
         try{
+            String fileName = "";
+            switch (type){
+                case 1:
+                    fileName="课题申请表";
+                    break;
+                case 2:
+                    fileName="课题任务书";
+                    break;
+                case 3:
+                    fileName="指导记录";
+                    break;
+                case 4:
+                    fileName="中期检查表";
+                    break;
+                case 5:
+                    fileName="答辩记录";
+                    break;
+                case 6:
+                    fileName="成绩评定表";
+                    break;
+
+            }
+
             Map map = new HashMap();
             Map m = (HashMap)request.getSession().getAttribute("userInfo");
 
             map.put("username",m.get("username").toString());
-            map.put("fileName",fileName);
+            map.put("type",type);
             StudentUploadFile studentUploadFile = studentService.getStudentFileInfo(map);
             return new ResponseEntity(1,"获取成功",studentUploadFile);
         }catch(Exception e){
@@ -264,27 +317,24 @@ public class StudentController {
     /**
      * 用于下载开题任务书
      */
-    @GetMapping("downOwnMissionBook")
+    @GetMapping("downTeacherUploadFile")
     @ResponseBody
-    @ApiOperation("用于下载开题任务书")
-    @ApiImplicitParam(name = "fileName",value = "文件名字",required = true,paramType = "query")
-    public ResponseEntity downOwnMissionBook(
-            @RequestParam("fileName") String fileName,
+    @ApiOperation("用于下载老师上传的文件")
+    public ResponseEntity downTeacherUploadFile(
+            @RequestParam Integer type,
             HttpServletRequest request,
             HttpServletResponse response
     ){
         try{
             //这个用户的 这个文件
             Map map = (HashMap)request.getSession().getAttribute("userInfo");
-            String username = map.get("username").toString();
-            Map dateMap = new HashMap();
-            dateMap.put("username",username);
-            dateMap.put("name",fileName);
-
+            TeacherUploadFile teacherUploadFile = new TeacherUploadFile();
+            teacherUploadFile.setUsername(map.get("username").toString());
+            teacherUploadFile.setType(type);
 
             //查找文件的全路径
-            String url = studentService.getMissionBookPath(dateMap);
-
+            String url = studentService.getMissionBookPath(teacherUploadFile);
+            String fileName = "课题任务书";
             boolean flag  = studentFileUtils.studentDownload(url,fileName,response,request);
             if(!flag) return new ResponseEntity(0,"下载失败",null);
             return new ResponseEntity(1,"下载成功",null);
@@ -295,23 +345,26 @@ public class StudentController {
     }
 
     /**
-     * 获取自己的任务书
+     * 获取指导老师上传的文件
      * @return
      */
-    @GetMapping("getOwnMissionBook")
+    @GetMapping("getTeacherUploadFile")
     @ResponseBody
-    @ApiOperation("获取自己的任务书")
-    public ResponseEntity getOwnMissionBook(
+    @ApiOperation("获取指导老师上传的文件")
+    @ApiImplicitParam(name = "type",value = "1 申请书 2 任务书 3 指导记录 4 中期检查表 5 答辩记录 6成绩评定表",paramType = "query",required = true)
+    public ResponseEntity getTeacherUploadFile(
+            @RequestParam Integer type,
             HttpServletRequest request
     ){
         try{
+
+
             Map map = (HashMap)request.getSession().getAttribute("userInfo");
             String username = map.get("username").toString();
-            String name = "吕梁学院2016届毕业论文（设计）课题任务书 ————"+username+".doc";
             TeacherUploadFile teacherUploadFile = new TeacherUploadFile();
-            teacherUploadFile.setName(name);
+            teacherUploadFile.setType(type);
             teacherUploadFile.setUsername(username);
-            TeacherUploadFile returnData = studentService.getOwnMissionBook(teacherUploadFile);
+            TeacherUploadFile returnData = studentService.getTeacherUploadFile(teacherUploadFile);
             return new ResponseEntity(1,"获取成功",returnData);
         }catch(Exception e){
             return new ResponseEntity(0,"获取失败",null);
