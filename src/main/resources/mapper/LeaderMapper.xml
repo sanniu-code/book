@@ -3,16 +3,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.duansanniu.mapper.LeaderMapper">
     <insert id="preserveCommonFileInfo" parameterType="map">
-        insert into t_commonFile(name,url,createTime) values(#{name},#{url},#{createTime})
+        insert into t_common_file(name,url,createTime) values(#{name},#{url},#{createTime})
     </insert>
 
     <select id="isPreserve" parameterType="map" resultType="Integer">
-        select ifnull(count(*),0) from t_commonFile
+        select ifnull(count(*),0) from t_common_file
           where name = #{name} and url = #{url}
     </select>
 
     <update id="updateCommonFileInfo" parameterType="map" >
-        update t_commonFile set createTime = #{createTime}
+        update t_common_file set createTime = #{createTime}
           where name = #{name} and url=#{url}
 
     </update>
@@ -66,4 +66,235 @@
     <insert id="createTask" parameterType="map" >
         insert  into t_task(name,departId,year,startTime,endTime) values (#{name},#{departId},#{year},#{startTime},#{endTime})
     </insert>
+
+    <insert id="addTeacher" parameterType="cn.duansanniu.entity.DoTeacher">
+        insert into t_teacher values(null,#{username},"111111",#{name},#{sex},#{professionRank},#{degree},#{departId},#{status})
+    </insert>
+
+    <select id="isExistTeacher" parameterType="cn.duansanniu.entity.DoTeacher" resultType="Integer">
+        select ifnull(count(*),0) from t_teacher where username = #{username}
+    </select>
+
+    <select id="getTeacherList" parameterType="Integer" resultType="cn.duansanniu.entity.DoTeacher">
+      select * from t_teacher where departId = #{departId}
+    </select>
+
+    <update id="updateTeacherPass" parameterType="cn.duansanniu.entity.DoTeacher" >
+        update t_teacher set password = #{password} where username = #{username}
+    </update>
+
+    <delete id="deleteTeacher" parameterType="cn.duansanniu.entity.DoTeacher">
+        delete from t_teacher where username = #{username}
+    </delete>
+
+    <select id="getStudentClassId" parameterType="map" resultType="Integer">
+        select tc.id from t_class tc
+          left join t_profession tp on tp.id = tc.professionid
+          where tc.name = #{className} and tp.name = #{profession}
+
+    </select>
+
+    <select id="isExistStudent" parameterType="cn.duansanniu.entity.DoStudent" resultType="Integer">
+        select ifnull(count(*),0) from t_student where username = #{username}
+    </select>
+    
+    <insert id="addStudent" parameterType="cn.duansanniu.entity.DoStudent" >
+        insert into t_student values(null,#{username},#{password},#{name},#{sex},#{classid},#{createTime},#{status},#{year})
+    </insert>
+
+
+    <update id="updateStudent" parameterType="cn.duansanniu.entity.DoStudent">
+      update t_student
+      <set>
+          <if test="name!=null and name !=''">
+              name = #{name},
+          </if>
+          <if test="sex!=null and sex !=''">
+              sex = #{sex},
+          </if>
+          <if test="classid!=null and classid !=''">
+              classid = #{classid},
+          </if>
+          <if test="createTime!=null">
+              createTime = #{createTime},
+          </if>
+          <if test="year!=null and year !=''">
+              year = #{year},
+          </if>
+      </set>
+      where username = #{username}
+
+    </update>
+
+    <resultMap id="Student" type="cn.duansanniu.entity.Student">
+        <id column="s_id" property="id"/>
+        <result column="s_username" property="username"/>
+        <result column="s_name" property="name"/>
+        <result column="s_sex" property="sex"/>
+        <result column="s_status" property="status"/>
+        <result column="s_createTime" property="createTime"/>
+        <result column="s_year" property="year"/>
+        <association property="classGrade" column="s_classGrade">
+            <id column="c_id" property="id"/>
+            <result column="c_name" property="name"/>
+            <association column="c_profession" property="profession">
+                <id column="p_id" property="id"/>
+                <result column="p_name" property="name"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <select id="getStudentList" parameterType="Integer" resultMap="Student">
+        select ts.id s_id,ts.username s_username,ts.name s_name, ts.sex s_sex,ts.status s_status,
+        ts.createTime s_createTime,ts.year s_year,
+        tc.id c_id,tc.name c_name,tp.id p_id,tp.name p_name
+        from t_student ts
+        left join t_class tc on tc.id = ts.classid
+        left join t_profession tp on tp.id = tc.professionid
+        where tp.departId = #{departId}
+    </select>
+
+    <update id="updateStudentPass" parameterType="cn.duansanniu.entity.DoStudent">
+        update t_student set password = #{password} where username = #{usename}
+    </update>
+
+    <delete id="deleteStudent" parameterType="cn.duansanniu.entity.DoStudent" >
+        delete from t_student where username = #{username}
+    </delete>
+
+    <insert id="addProfession" parameterType="cn.duansanniu.entity.DoProfession" >
+        insert into t_profession values(null,#{departId},#{name})
+    </insert>
+
+    <delete id="deleteProfession" parameterType="cn.duansanniu.entity.DoProfession">
+        delete from t_profession where id = #{id}
+    </delete>
+
+    <update id="updateProfession" parameterType="cn.duansanniu.entity.DoProfession">
+        update t_profession
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getAllProfession" parameterType="cn.duansanniu.entity.DoProfession" resultType="cn.duansanniu.entity.DoProfession">
+        select * from t_profession where departId = #{departId}
+    </select>
+
+    <select id="isExsitProfession" parameterType="cn.duansanniu.entity.DoProfession" resultType="cn.duansanniu.entity.DoProfession">
+        select * from t_profession where name = #{name} and departId = #{departId}
+    </select>
+
+
+    <update id="updateClassGrade" parameterType="cn.duansanniu.entity.DoClassGrade">
+        update t_class
+        <set>
+            <if test="name != '' and name != null">
+                name = #{name},
+            </if>
+            <if test="professionid != '' and professionid != null">
+                professionid = #{professionid}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <resultMap id="ClassGrade" type="cn.duansanniu.entity.ClassGrade">
+        <id property="id" column="tc_id" />
+        <result property="name" column="tc_name" />
+        <association property="profession">
+            <id column="tp_id" property="id"/>
+            <result property="name" column="tp_name"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllClassGrade" parameterType="Integer" resultMap="ClassGrade">
+        select tc.id tc_id,tc.name tc_name,tp.id tp_id,tp.name tp_name from t_class tc
+          left join t_profession tp on tc.professionid = tp.id
+          where tp.departId = #{departId}
+    </select>
+
+    <select id="isExsitClassGrade" parameterType="cn.duansanniu.entity.DoClassGrade" resultType="cn.duansanniu.entity.DoClassGrade">
+        select * from t_class where professionid = #{professionid} and name = #{name}
+    </select>
+
+
+    <resultMap id="Subjects" type="cn.duansanniu.entity.Subjects">
+        <id property="id" column="s_id" />
+        <result property="title" column="s_title"/>
+        <result property="detail" column="s_detail"/>
+        <result property="type" column="s_type"/>
+        <result property="origin" column="s_origin"/>
+        <result property="address" column="s_address"/>
+        <association property="teacherFile" >
+            <id property="id" column="f_id"/>
+            <result property="name" column="f_name"/>
+            <result property="url" column="f_url"/>
+            <result property="createTime" column="f_createTime"/>
+            <result property="fileType" column="f_fileType"/>
+        </association>
+        <association property="teacher">
+            <result property="name" column="t_name"/>
+            <result property="degree" column="t_degree"/>
+            <result property="professionRank" column="t_professionRank"/>
+        </association>
+
+
+    </resultMap>
+    <select id="getAllNoExamineFile" parameterType="Integer" resultMap="Subjects">
+      select tts.id s_id,tts.title s_title,tts.detail s_detail,tts.type s_type,tts.origin s_origin,tts.address s_address,
+        ttf.id f_id,ttf.name f_name,ttf.url f_url,ttf.createTime f_createTime,ttf.fileType f_fileType,
+        tt.name t_name,tt.degree t_degree,tt.professionRank t_professionRank
+       from t_teacher_subject tts
+        left join t_teacher_file ttf on ttf.subjectId = tts.id
+        left join t_teacher tt on tt.username = ttf.username
+        where tts.taskId  = #{daskId} and tts.status = 0 and ttf.fileType = 1
+    </select>
+
+    <update id="examineTeacherFile" parameterType="cn.duansanniu.entity.DoSubject">
+        update t_teacher_subject
+        <set>
+            <if test="status != null || status!= ''">
+                status = #{status}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateTeacher" parameterType="cn.duansanniu.entity.DoTeacher" >
+        update t_teacher
+        <set>
+            <if test="username!= null and username!=''">
+                username = #{username},
+            </if>
+            <if test="name!= null and name!= ''">
+                name = #{name},
+            </if>
+            <if test="sex!=null and sex!=''">
+                sex = #{sex},
+            </if>
+            <if test="degree!=null and degree!=''">
+                degree = #{degree},
+            </if>
+            <if test="professionRank!=null and professionRank!=''">
+                professionRank = #{professionRank}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getClassByProfession" parameterType="Integer" resultType="cn.duansanniu.entity.ClassGrade">
+        select * from t_class where professionid = #{id}
+    </select>
+
+    <insert id="addClassGrade" parameterType="cn.duansanniu.entity.DoClassGrade">
+        insert into t_class values(null,#{professionid},#{name})
+    </insert>
+
+
+
+
 </mapper>

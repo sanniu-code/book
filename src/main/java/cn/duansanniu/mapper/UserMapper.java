@@ -19,7 +19,7 @@ public interface UserMapper {
 
     public Map leaderLogin(User user);
 
-    public String getFilePath(String fileName);
+    public String getFilePath(Integer id);
 
     public List<CommonFile> getUserFileList();
 
@@ -40,6 +40,12 @@ public interface UserMapper {
     public Integer getStudentDepartIdByUsername(String username);
 
     public Integer getTeacherDepartIdByUsername(String username);
+
+    public List<Menu> getMenu(Integer userType);
+
+    public List<Menu> getParentMenu(Integer userType);
+
+    public List<Menu> getSonMenu(Integer userType);
 
 
 }

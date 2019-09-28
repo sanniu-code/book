@@ -20,10 +20,11 @@ public class Student {
     private Integer sex;
     private Integer status;
     private Date createTime;
+    private Integer year;
     private ClassGrade classGrade;
 
 
-    public Student(Integer id, String username, String password, String name, Integer sex, Integer status, Date createTime, ClassGrade classGrade) {
+    public Student(Integer id, String username, String password, String name, Integer sex, Integer status, Date createTime, Integer year, ClassGrade classGrade) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -31,6 +32,7 @@ public class Student {
         this.sex = sex;
         this.status = status;
         this.createTime = createTime;
+        this.year = year;
         this.classGrade = classGrade;
     }
 

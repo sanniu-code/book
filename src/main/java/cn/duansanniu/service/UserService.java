@@ -1,6 +1,7 @@
 package cn.duansanniu.service;
 
 import cn.duansanniu.entity.CommonFile;
+import cn.duansanniu.entity.Menu;
 import cn.duansanniu.entity.Task;
 import cn.duansanniu.entity.User;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 public interface UserService {
     public Map login(User user);
 
-    public String getFilePath(String fileName);
+    public String getFilePath(Integer id);
 
     public List<CommonFile> getUserFileList();
 
@@ -27,6 +28,8 @@ public interface UserService {
     public Integer getStudentDepartIdByUsername(String username);
 
     public Integer getTeacherDepartIdByUsername(String username);
+
+    public List<Menu> getMenu(Integer userType);
 
 
 }

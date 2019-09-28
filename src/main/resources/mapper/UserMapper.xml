@@ -7,7 +7,7 @@
 
 
     <select id="studentLogin" parameterType="cn.duansanniu.entity.User" resultType="map">
-        select ts.id,ts.username,ts.name,ts.sex,ts.classid,ts.createTime,ts.status,tc.name className,tp.name professionName,td.name departName  from t_student ts
+        select ts.id,ts.username,ts.name,ts.sex,ts.classid,ts.createTime,ts.status,ts.year,tc.name className,tp.name professionName,td.name departName,tp.departId  from t_student ts
           left join t_class  tc on tc.id = ts.classid
           left join t_profession tp on tp.id = tc.professionid
           left join t_depart td on td.id = tp.departId
@@ -24,8 +24,8 @@
         select id,username,name,departId from t_leader where username = #{username} and password = #{password}
     </select>
 
-    <select id="getFilePath" parameterType="String" resultType="String">
-        select url from t_commonFile where name = #{fileName}
+    <select id="getFilePath" parameterType="Integer" resultType="String">
+        select url from t_common_file where id = #{id}
     </select>
 
     <select id="getUserFileList" resultType="cn.duansanniu.entity.CommonFile">
@@ -73,5 +73,32 @@
         select ifnull(departId,0) from t_teacher where username = #{username}
 
     </select>
+    
+    <resultMap id="Menu" type="cn.duansanniu.entity.Menu">
+        <id column="id" property="id"/>
+        <result column="path" property="path"/>
+        <result column="name" property="name"/>
+        <collection property="menus" javaType="cn.duansanniu.entity.Menu">
+            <id column="m_id" property="id"/>
+            <result column="m_path" property="path"/>
+            <result column="m_name" property="name"/>
+        </collection>
+    </resultMap>
+    <select id="getMenu" parameterType="Integer" resultMap="Menu">
+        select  tp.*,ts.id m_id,ts.path m_path,ts.name m_path from t_user_menu tum
+        left join t_parentMenu tp on tp.id = tum.parentMenuid
+        left join t_sonMenu ts on tp.id = ts.parentid
+        where tum.userType = #{userType} and ts.userType = #{userType} group by tp.name
 
+    </select>
+    
+    <select id="getParentMenu" parameterType="Integer" resultType="cn.duansanniu.entity.Menu">
+        select * from t_parentMenu tp
+          left join t_user_menu tsm on tsm.parentMenuid = tp.id
+          where tsm.userType = #{userType}
+    </select>
+
+    <select id="getSonMenu" parameterType="Integer" resultType="cn.duansanniu.entity.Menu">
+        select ts.name,ts.path,ts.parentid from t_sonMenu ts where ts.userType = #{userType}
+    </select>
 </mapper>

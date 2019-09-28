@@ -7,6 +7,7 @@ import cn.duansanniu.service.UserService;
 import cn.duansanniu.utils.ResponseEntity;
 import cn.duansanniu.utils.StudentFileUtils;
 import cn.duansanniu.utils.TeacherFileUtils;
+import com.sun.xml.internal.ws.resources.HttpserverMessages;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -202,37 +203,56 @@ public class TeacherController {
                 String extendFileName = name.substring(name.lastIndexOf("."));
                 String newName = title+"申请表"+extendFileName;
                 Map map = (HashMap)request.getSession().getAttribute("userInfo");
+                //返回上传的文件的信息
                 Map returnMap = teacherFileUtils.teacherUpload(applyTable.getMultipartFile(),newName,map);
                 returnMap.put("studentusername","");
                 returnMap.put("username",map.get("username").toString());
                 returnMap.put("fileType",1);
                 //保存到数据库
-            Integer tempNum = teacherService.storePath(returnMap);
+                Integer tempNum = teacherService.storePath(returnMap);
 
                 //返回对应的id
-            Integer fileId = null;
+//            Integer fileId = null;
             if(tempNum <= 0){
                 return new ResponseEntity(0,"新增失败",null);
             }
-            if(tempNum == 1){
-                //这是新增
-                fileId  = Integer.valueOf(returnMap.get("id").toString());
-            }else {
-                //这是修改的
-                fileId = tempNum;
-            }
+//            if(tempNum == 1){
+//                //这是新增
+//                fileId  = Integer.valueOf(returnMap.get("id").toString());
+//            }else {
+//                //这是修改的
+//                fileId = tempNum;
+//            }
 
+            //获取当前系的任务的id
+            /***********************/
+            Task task = (Task)request.getSession().getAttribute("task");
+            Integer taskId = task.getId();
             //新增课题
 
             applyTable.setUsername(map.get("username").toString());
 
             applyTable.setStatus(0);
 
-            applyTable.setFileId(fileId);
+            applyTable.setFileId(tempNum);
 
+            applyTable.setTaskId(taskId);
+
+            //id
             Integer num = teacherService.uploadApplyTable(applyTable);
 
+
             if(num <= 0){
+                return new ResponseEntity(0,"新增失败",null);
+            }
+            //获取这条数据的id
+            //修改文件信息
+            //将id赋值到t_teacher_file 的subjectId中
+            Map m = new HashMap();
+            m.put("id",tempNum);
+            m.put("subjectId",applyTable.getId());
+            Integer flag = teacherService.updateSubjectFile(m);
+            if(flag<= 0){
                 return new ResponseEntity(0,"新增失败",null);
             }
             return new ResponseEntity(1,"成功",null);
@@ -375,55 +395,55 @@ public class TeacherController {
      * @param studentUploadFile
      * @return
      */
-    @ResponseBody
-    @PostMapping("FailExamineStudentUploadFile")
-    @ApiOperation("驳回学生上传的文件")
-    public ResponseEntity FailExamineStudentUploadFile(
-            @RequestBody StudentUploadFile studentUploadFile
-    ){
-        try{
-            Integer num = teacherService.failExamineStudentUploadFile(studentUploadFile);
-            if(num <= 0) return new ResponseEntity(0,"驳回失败",null);
-            return new ResponseEntity(1,"驳回成功",null);
-        }catch(Exception e){
-            return new ResponseEntity(0,"驳回失败",null);
-        }
-    }
-
-
-
-    /**
-     * 通过学生上传的文件
-     * @param studentUploadFile
-     * @return
-     */
-    @ResponseBody
-    @PostMapping("ExamineStudentUploadFile")
-    @ApiOperation("通过学生上传的文件")
-    public ResponseEntity examineStudentUploadFile(
-            @RequestBody StudentUploadFile studentUploadFile
-    ){
-        try{
-            Integer num = teacherService.examineStudentUploadFile(studentUploadFile);
-            if(num <= 0) return new ResponseEntity(0,"修改失败",null);
-
-            //获取某个学生通过审核的文件个数
-            Integer count = teacherService.getStudentExamineFileCount(studentUploadFile.getStudent().getUsername());
-
-            //修改 某个学生处于哪个阶段
-            Map m = new HashMap();
-            m.put("username",studentUploadFile.getStudent().getUsername());
-            m.put("count",count+1);
-            Integer flag = teacherService.updateStudentStage(m);
-            if(flag <= 0) return new ResponseEntity(0,"修改失败",null);
-
-
-
-            return new ResponseEntity(0,"修改成功",null);
-        }catch (Exception e){
-            return new ResponseEntity(0,"修改失败",null);
-        }
-    }
+//    @ResponseBody
+//    @PostMapping("FailExamineStudentUploadFile")
+//    @ApiOperation("驳回学生上传的文件")
+//    public ResponseEntity FailExamineStudentUploadFile(
+//            @RequestBody StudentUploadFile studentUploadFile
+//    ){
+//        try{
+//            Integer num = teacherService.failExamineStudentUploadFile(studentUploadFile);
+//            if(num <= 0) return new ResponseEntity(0,"驳回失败",null);
+//            return new ResponseEntity(1,"驳回成功",null);
+//        }catch(Exception e){
+//            return new ResponseEntity(0,"驳回失败",null);
+//        }
+//    }
+//
+//
+//
+//    /**
+//     * 通过学生上传的文件
+//     * @param studentUploadFile
+//     * @return
+//     */
+//    @ResponseBody
+//    @PostMapping("ExamineStudentUploadFile")
+//    @ApiOperation("通过学生上传的文件")
+//    public ResponseEntity examineStudentUploadFile(
+//            @RequestBody StudentUploadFile studentUploadFile
+//    ){
+//        try{
+//            Integer num = teacherService.examineStudentUploadFile(studentUploadFile);
+//            if(num <= 0) return new ResponseEntity(0,"修改失败",null);
+//
+//            //获取某个学生通过审核的文件个数
+//            Integer count = teacherService.getStudentExamineFileCount(studentUploadFile.getStudent().getUsername());
+//
+//            //修改 某个学生处于哪个阶段
+//            Map m = new HashMap();
+//            m.put("username",studentUploadFile.getStudent().getUsername());
+//            m.put("count",count+1);
+//            Integer flag = teacherService.updateStudentStage(m);
+//            if(flag <= 0) return new ResponseEntity(0,"修改失败",null);
+//
+//
+//
+//            return new ResponseEntity(0,"修改成功",null);
+//        }catch (Exception e){
+//            return new ResponseEntity(0,"修改失败",null);
+//        }
+//    }
 
 
     /**
@@ -484,19 +504,17 @@ public class TeacherController {
     @ResponseBody
     @ApiOperation("下载老师上传的文件")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id",value ="文件的id",paramType = "query",required = true),
-            @ApiImplicitParam(name = "fileName",value ="文件的名字",paramType = "query",required = true)
+            @ApiImplicitParam(name = "id",value ="文件的id",paramType = "query",required = true)
 
     })
     public ResponseEntity downTeacherFile(
             @RequestParam("id") Integer id,
-            @RequestParam("fileName") String fileName,
             HttpServletRequest request,
             HttpServletResponse response
     ){
         try{
             String url = teacherService.getPathUrlByFileId(id);
-            Boolean b = teacherFileUtils.TeacherDownload(url,fileName,response,request);
+            Boolean b = teacherFileUtils.teacherDownload(url,response,request);
             if(b){
                 return  new ResponseEntity(1,"下载成功",null);
             }else {
@@ -550,9 +568,68 @@ public class TeacherController {
             if(num <= 0){
                 return new ResponseEntity(0,"网络异常",null);
             }
+            if(status == 1){
+
+
+                //修改当前学生的状态
+                Map m = new HashMap();
+                m.put("id",id);
+                Integer n = teacherService.setStudentSubjectStatus(m);
+            }
+
+
+
+
             return new ResponseEntity(1,"修改成功",null);
         }catch (Exception e){
             return new ResponseEntity(0,"网络异常",null);
+        }
+    }
+
+    @GetMapping("/downStudentFile")
+    @ResponseBody
+    @ApiOperation("下载学生的文件")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id",value = "文件的id",required = true,paramType = "query"),
+            @ApiImplicitParam(name = "fileName",value = "文件的fileName 最终下载后的名字",required = true,paramType = "query")
+    })
+    public ResponseEntity downStudentFile(
+            @RequestParam("id") Integer id,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ){
+        try{
+            String url = teacherService.getStudentFilePathById(id);
+            Boolean b = teacherFileUtils.teacherDownload(url,response,request);
+            if(b){
+                return new ResponseEntity(1,"下载成功",null);
+            }else {
+                return new ResponseEntity(0,"下载失败",null);
+            }
+        }catch (Exception e){
+            return new ResponseEntity(0,"下载失败",null);
+        }
+    }
+
+
+    @GetMapping("/getTeacherUploadFile")
+    @ResponseBody
+    @ApiOperation("获取老师上传的文件")
+    @ApiImplicitParam(name = "type",value = "文件的类型",required = true,paramType = "query")
+    public ResponseEntity getTeacherUploadFile(
+            @RequestParam("type") Integer type,
+            HttpServletRequest request
+
+    ){
+        try{
+            Map map = (HashMap)request.getSession().getAttribute("userInfo");
+            Map tempMap = new HashMap();
+            tempMap.put("username",map.get("username"));
+            tempMap.put("type",type);
+            List<TeacherUploadFile> teacherUploadFiles = teacherService.getTeacherUploadFile(tempMap);
+            return new ResponseEntity(1,"获取成功",teacherUploadFiles);
+        }catch (Exception e){
+            return new ResponseEntity(0,"获取失败",null);
         }
     }
 

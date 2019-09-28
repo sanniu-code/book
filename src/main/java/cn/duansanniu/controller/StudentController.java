@@ -1,10 +1,8 @@
 package cn.duansanniu.controller;
 
-import cn.duansanniu.entity.Student;
-import cn.duansanniu.entity.StudentUploadFile;
-import cn.duansanniu.entity.Subjects;
-import cn.duansanniu.entity.TeacherUploadFile;
+import cn.duansanniu.entity.*;
 import cn.duansanniu.service.StudentService;
+import cn.duansanniu.service.UserService;
 import cn.duansanniu.utils.DateUtils;
 import cn.duansanniu.utils.ResponseEntity;
 import cn.duansanniu.utils.StudentFileUtils;
@@ -27,6 +25,7 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +49,9 @@ public class StudentController {
     @Autowired
     private DateUtils dateUtils;
 
+    @Autowired
+    private UserService userService;
+
 
 
     /**
@@ -64,7 +66,8 @@ public class StudentController {
     })
     public ResponseEntity getSubjects(
             @PathVariable("pageSize") Integer pageSize,
-            @PathVariable("pageNum") Integer pageNum
+            @PathVariable("pageNum") Integer pageNum,
+            HttpServletRequest request
     ){
         try{
             if(pageNum == null || pageNum == 0){
@@ -73,8 +76,27 @@ public class StudentController {
             if(pageSize == null || pageSize == 0){
                 pageSize = 10;
             }
+            //获取当前任务
+
+            /*Task task = (Task)request.getSession().getAttribute("task");
+            Integer taskId = task.getId();*/
+            Map map = (HashMap)request.getSession().getAttribute("userInfo");
+            Integer departId = (Integer)map.get("departId");
+            //获取任务的id
+            Map tempMap = new HashMap();
+            tempMap.put("departId",departId);
+            tempMap.put("time",new Date());
+
+
+            Task task = userService.isEffectiveTask(tempMap);
+            if(task == null){
+                return new ResponseEntity(0,"网络异常",null);
+            }
+
+
+
             PageHelper.startPage(pageNum,pageSize);
-            List<Subjects> subjects = studentService.getSubjects();
+            List<Subjects> subjects = studentService.getSubjects(task.getId());
             PageInfo pageInfo = new PageInfo(subjects);
             return new ResponseEntity(1,"获取信息成功",pageInfo);
         }catch(Exception e){

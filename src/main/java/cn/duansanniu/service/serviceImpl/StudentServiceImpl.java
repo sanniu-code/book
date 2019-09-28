@@ -1,9 +1,6 @@
 package cn.duansanniu.service.serviceImpl;
 
-import cn.duansanniu.entity.Student;
-import cn.duansanniu.entity.StudentUploadFile;
-import cn.duansanniu.entity.Subjects;
-import cn.duansanniu.entity.TeacherUploadFile;
+import cn.duansanniu.entity.*;
 import cn.duansanniu.mapper.StudentMapper;
 import cn.duansanniu.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +21,8 @@ public class StudentServiceImpl implements StudentService {
     private StudentMapper studentMapper;
 
     @Override
-    public List<Subjects> getSubjects() {
-        List<Subjects> subjects = studentMapper.getSubjects();
+    public List<Subjects> getSubjects(Integer taskId) {
+        List<Subjects> subjects = studentMapper.getSubjects(taskId);
         return subjects;
     }
 
@@ -118,4 +115,7 @@ public class StudentServiceImpl implements StudentService {
     public Integer changeSubjectFileUsername(Map map) {
         return studentMapper.changeSubjectFileUsername(map);
     }
+
+
+
 }

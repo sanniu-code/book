@@ -3,10 +3,13 @@ package cn.duansanniu.service.serviceImpl;
 import cn.duansanniu.entity.*;
 import cn.duansanniu.mapper.UserMapper;
 import cn.duansanniu.service.UserService;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +48,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getFilePath(String fileName) {
+    public String getFilePath(Integer id) {
 
 
-        return userMapper.getFilePath(fileName);
+        return userMapper.getFilePath(id);
     }
 
     @Override
@@ -97,5 +100,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public Integer getTeacherDepartIdByUsername(String username) {
         return userMapper.getTeacherDepartIdByUsername(username);
+    }
+
+    @Override
+    public List<Menu> getMenu(Integer userType) {
+        //先获取所有的父类
+        List<Menu> menus = userMapper.getParentMenu(userType);
+        System.out.println(menus);
+        //再获取所有的子类
+        List<Menu> menuList = userMapper.getSonMenu(userType);
+        System.out.println(menuList);
+
+        for(Integer i = 0;i<menus.size();i++){
+
+            Menu mainMenu = menus.get(i);
+
+            for(Integer j = 0;j<menuList.size();j++){
+
+                Menu menu = menuList.get(j);
+                if(menu.getParentid() == mainMenu.getId()){
+                    if(mainMenu.getMenus() == null){
+                        mainMenu.setMenus(new ArrayList()) ;
+                    }
+                    mainMenu.getMenus().add(menu);
+                }
+            }
+        }
+
+        return menus;
     }
 }

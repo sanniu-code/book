@@ -1,9 +1,6 @@
 package cn.duansanniu.service.serviceImpl;
 
-import cn.duansanniu.entity.ApplyTable;
-import cn.duansanniu.entity.StudentList;
-import cn.duansanniu.entity.StudentUploadFile;
-import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.*;
 import cn.duansanniu.mapper.TeacherMapper;
 import cn.duansanniu.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,21 +67,30 @@ public class TeacherServiceImpl implements TeacherService {
         //判断是否存在
             //如果存在 就修改
             //如果不存在 就新增
-        if(teacherMapper.isExitFile(map) <= 0){//不存在
-            Integer num = teacherMapper.storeFile(map);
-            if(num <= 0){
-                return 0;
-            }
-            return num;
-        }else {
-            Integer num = teacherMapper.updateFile(map);
-            if(num <= 0){
-                return 0;
-            }
-            //获取这条数据的id
-            Integer id = teacherMapper.getFileId(map);
-            return id;
+        Integer num = teacherMapper.storeFile(map);
+        if(num <= 0){
+
+            return 0;
         }
+        System.out.println(map);
+        Integer id = Integer.valueOf(map.get("id").toString());
+        return id;
+//        if(teacherMapper.isExitFile(map) <= 0){//不存在
+//            Integer num = teacherMapper.storeFile(map);
+//            if(num <= 0){
+//                return 0;
+//            }
+//            return num;
+//        }else { //存在
+//            return 0;
+            //Integer num = teacherMapper.updateFile(map);
+//            if(num <= 0){
+//                return 0;
+//            }
+//            //获取这条数据的id
+//            Integer id = teacherMapper.getFileId(map);
+//            return id;
+        //}
 
     }
 
@@ -117,5 +123,25 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public Integer examineStudentFile(Map map) {
         return teacherMapper.examineStudentFile(map);
+    }
+
+    @Override
+    public String getStudentFilePathById(Integer id) {
+        return teacherMapper.getStudentFilePathById(id);
+    }
+
+    @Override
+    public List<TeacherUploadFile> getTeacherUploadFile(Map map) {
+        return teacherMapper.getTeacherUploadFile(map);
+    }
+
+    @Override
+    public Integer setStudentSubjectStatus(Map map) {
+        return teacherMapper.setStudentSubjectStatus(map);
+    }
+
+    @Override
+    public Integer updateSubjectFile(Map map) {
+        return teacherMapper.updateSubjectFile(map);
     }
 }

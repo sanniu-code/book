@@ -13,6 +13,7 @@ import java.util.Date;
 @Setter
 @Getter
 public class ApplyTable {
+    private Integer id;
     private String username;
     private Integer status;
     private String title;
@@ -21,9 +22,11 @@ public class ApplyTable {
     private String origin;
     private String address;
     private Integer fileId;
+    private Integer taskId;
     private MultipartFile multipartFile;
 
-    public ApplyTable(String username, Integer status, String title, String detail, String type, String origin, String address, Integer fileId, MultipartFile multipartFile) {
+    public ApplyTable(Integer id, String username, Integer status, String title, String detail, String type, String origin, String address, Integer fileId, Integer taskId, MultipartFile multipartFile) {
+        this.id = id;
         this.username = username;
         this.status = status;
         this.title = title;
@@ -32,6 +35,7 @@ public class ApplyTable {
         this.origin = origin;
         this.address = address;
         this.fileId = fileId;
+        this.taskId = taskId;
         this.multipartFile = multipartFile;
     }
 

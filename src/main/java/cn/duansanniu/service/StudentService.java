@@ -1,9 +1,6 @@
 package cn.duansanniu.service;
 
-import cn.duansanniu.entity.Student;
-import cn.duansanniu.entity.StudentUploadFile;
-import cn.duansanniu.entity.Subjects;
-import cn.duansanniu.entity.TeacherUploadFile;
+import cn.duansanniu.entity.*;
 import org.omg.CORBA.INTERNAL;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +13,7 @@ import java.util.Map;
  */
 
 public interface StudentService {
-    public List<Subjects> getSubjects();
+    public List<Subjects> getSubjects(Integer taskId);
 
     public Subjects getSubject(String username);
 
@@ -45,7 +42,6 @@ public interface StudentService {
     public Integer getStudentStage(String username);
 
     public TeacherUploadFile getTeacherUploadFile(TeacherUploadFile teacherUploadFile);
-
 
 
 

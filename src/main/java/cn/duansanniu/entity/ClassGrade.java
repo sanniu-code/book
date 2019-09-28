@@ -1,6 +1,9 @@
 package cn.duansanniu.entity;
 
 import cn.duansanniu.entity.Profession;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +13,13 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@ApiModel(value = "班级对象")
 public class ClassGrade {
+    @ApiModelProperty(name = "id",value = "班级的id")
     private Integer id;
+    @ApiModelProperty(name = "name",value = "班级的名字")
     private String name;
+    @ApiModelProperty(name = "profession",value = "专业对象")
     private Profession profession;
 
     public ClassGrade() {

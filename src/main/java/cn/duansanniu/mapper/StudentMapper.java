@@ -1,9 +1,6 @@
 package cn.duansanniu.mapper;
 
-import cn.duansanniu.entity.Student;
-import cn.duansanniu.entity.StudentUploadFile;
-import cn.duansanniu.entity.Subjects;
-import cn.duansanniu.entity.TeacherUploadFile;
+import cn.duansanniu.entity.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,7 +12,7 @@ import java.util.Map;
  */
 @Repository
 public interface StudentMapper {
-    public List<Subjects> getSubjects();
+    public List<Subjects> getSubjects(Integer taskId);
 
     public Subjects getSubject(String username);
 
@@ -51,6 +48,7 @@ public interface StudentMapper {
 
 
     public Integer changeSubjectFileUsername(Map map);
+
 
 
 

@@ -1,9 +1,6 @@
 package cn.duansanniu.mapper;
 
-import cn.duansanniu.entity.ApplyTable;
-import cn.duansanniu.entity.StudentList;
-import cn.duansanniu.entity.StudentUploadFile;
-import cn.duansanniu.entity.Subjects;
+import cn.duansanniu.entity.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -46,10 +43,20 @@ public interface TeacherMapper {
 
     public List<Subjects> getTeacherSubjects(String username);
 
+//    这个是老师的文件url
     public String getPathUrlByFileId(Integer id);
 
     public List<StudentUploadFile> getStudentFileInfo(Map map);
 
     public Integer examineStudentFile(Map map);
+
+    public String getStudentFilePathById(Integer id);
+
+    public List<TeacherUploadFile> getTeacherUploadFile(Map map);
+
+    public Integer setStudentSubjectStatus(Map map);
+
+    public Integer updateSubjectFile(Map map);
+
 
 }

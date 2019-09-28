@@ -18,11 +18,13 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -58,9 +60,10 @@ public class UserController {
                 || user.getCode().length() == 0 || user.getType() == null
             ) return new ResponseEntity(0,"请完善数据",null);
 
-            //判断这个用户的系是否存在有效的任务
-            //获取这个用户对象的信息
 
+
+
+            //判断这个用户的系是否存在有效的任务
             if(user.getType() == 1 || user.getType() == 2){
                 Integer departId = 0;
                 if(user.getType() == 1){
@@ -79,7 +82,11 @@ public class UserController {
                 if(task == null){
                     return new ResponseEntity(2,"您还没有权限",null);
                 }
+                request.getSession().setAttribute("task",task);
             }
+
+
+
 
 
 
@@ -93,6 +100,31 @@ public class UserController {
             Map o = userService.login(user);
             if(o == null)
                 return new ResponseEntity(0,"账号或密码错误",null);
+
+            //判断这个用户是否是大四的
+            if(user.getType() == 1){
+                Integer year = (Integer)o.get("year");
+                Date createTime = (Date)o.get("createTime");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
+                String createTimeYear = simpleDateFormat.format(createTime);
+                Integer startYear=Integer.valueOf(createTimeYear) + (year-1); //要开始选题了
+                Integer endYear=Integer.valueOf(createTimeYear) + year; //要开始选题了\
+                String startTimeStr = startYear+"-09-01 00:00:00";
+                String endTimeStr = endYear+"-06-01 00:00:00";
+                Date startTime = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(startTimeStr);
+                Date endTime = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(endTimeStr);
+
+
+
+
+
+
+
+                if(startTime.getTime() > new Date().getTime() || endTime.getTime() < new Date().getTime()){
+                    return new ResponseEntity(2,"您还没有权限",null);
+                }
+            }
+
 
             //保存用户信息
             HttpSession session = request.getSession();
@@ -127,19 +159,20 @@ public class UserController {
     /**
      * 有关常用表的下载
      */
-    @GetMapping("/download")
+    @GetMapping("/downloadApplyTable")
     @ResponseBody
     @ApiOperation(value = "用于下载常用表")
-    @ApiImplicitParam(name = "fileName",value = "文件的名字",required = true,paramType = "query")
+    @ApiImplicitParam(name = "id",value = "文件的id",required = true,paramType = "query")
     public ResponseEntity downloadApplyTable(
-            @RequestParam(value = "fileName") String fileName, HttpServletRequest request, HttpServletResponse response){
+            @RequestParam(value = "id") Integer id, HttpServletRequest request, HttpServletResponse response){
         try{
 
             //获取文件路径
-            String url = userService.getFilePath(fileName);
+            String url = userService.getFilePath(id);
             if(url.length() < 0) return new ResponseEntity(0,"下载失败",null);
             File file = new File(url);
             FileInputStream fis = new FileInputStream(file);
+            String fileName = url.substring(url.lastIndexOf("\\")+1);
             //获取后缀名
             String extendFileName = fileName.substring(fileName.lastIndexOf("."));
             //动态设置响应类型 根据前台传递文件类型设置响应类型
@@ -234,10 +267,13 @@ public class UserController {
             map.put("username",username);
             map.put("type",(Integer)m.get("type"));
 
+
+
             //查看这个原密码是否正确
             Integer flag = userService.judgePass(map);
             if(flag <= 0)
                 return new ResponseEntity(0,"密码修改失败",null);
+
             Integer num = userService.updatePass(map);
             if(num <= 0)
                 return new ResponseEntity(0,"密码修改失败",null);
@@ -298,6 +334,24 @@ public class UserController {
 //        }
 //    }
 
+
+    @GetMapping("/getMenu")
+    @ResponseBody
+    @ApiOperation("获取用户对应的")
+    public ResponseEntity getMenu(
+            HttpServletRequest request
+    ){
+        try{
+            Integer userType = (Integer)request.getSession().getAttribute("type");
+
+
+            List<Menu> menus = userService.getMenu(userType);
+
+            return new ResponseEntity(1,"获取成功",menus);
+        }catch (Exception e){
+            return new ResponseEntity(0,"网络异常",null);
+        }
+    }
 
 
 }

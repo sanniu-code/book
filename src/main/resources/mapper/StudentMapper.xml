@@ -10,6 +10,7 @@
         <result property="type" column="type" />
         <result property="origin" column="origin"/>
         <result property="address" column="address"/>
+        <result property="status" column="status"/>
 
         <association property="teacher" >
             <id property="id" column="teacher_id"/>
@@ -25,19 +26,24 @@
             <result property="name" column="student_name"/>
             <result property="sex" column="student_sex"/>
         </association>
+        <association property="teacherFile">
+            <id column="id" property="t_id"/>
+        </association>
     </resultMap>
 
 
     <!--获取课题列表信息 -->
-    <select id="getSubjects" resultMap="Subjects">
-        select tts.id as subject_id,tts.title,tts.detail,tts.type,tts.origin,tts.address,
+    <select id="getSubjects" resultMap="Subjects" parameterType="Integer">
+        select tts.id as subject_id,tts.title,tts.detail,tts.type,tts.origin,tts.address,tts.status,
                 tt.id as teacher_id,tt.username as teacher_username,tt.name as teacher_name,tt.sex as teacher_sex,tt.professionRank as teacher_professionRank,tt.degree as teacher_degree,
-                ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex
+                ts.id as student_id,ts.username as student_username,ts.name as student_name,ts.sex as student_sex,
+                ttf.id t_id
                 from t_teacher_subject tts
           left join t_teacher tt on tt.username = tts.username
           left join t_student_subject tss on tts.id = tss.subjectId
           left join t_student ts on ts.username = tss.username
-          where tts.status = 1
+          left join t_teacher_file ttf on ttf.subjectId = tts.id
+          where tts.status = 1 and tts.taskId = 6 and ttf.fileType = 1
     </select>
 
     <!--获取某个学生所报的课题的详情-->
@@ -126,6 +132,7 @@
     <select id="getTeacherUploadFile" parameterType="cn.duansanniu.entity.TeacherUploadFile" resultType="cn.duansanniu.entity.TeacherUploadFile">
         select * from t_teacher_file where studentusername = #{username} and fileType = #{type}
     </select>
+
 
 
 </mapper>
