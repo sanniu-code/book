@@ -55,6 +55,10 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
         //这是老师上传的文件
         registry.addResourceHandler("/teacherFile/**")
                 .addResourceLocations("classpath:/static/teacherFile/");
+
+        registry.
+                addResourceHandler("/static/**").
+                addResourceLocations("classpath:/static/","file:static/");
         super.addResourceHandlers(registry);
      }
 }

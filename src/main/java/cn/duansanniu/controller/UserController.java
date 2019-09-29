@@ -343,6 +343,17 @@ public class UserController {
     ){
         try{
             Integer userType = (Integer)request.getSession().getAttribute("type");
+            Map sessionMap = (HashMap)request.getSession().getAttribute("userInfo");
+            Integer departId = (Integer)sessionMap.get("departId");
+
+            //先判断有没有有效的任务
+            Map map = new HashMap();
+            map.put("departId",departId);
+            map.put("time",new Date());
+            Task task = userService.isEffectiveTask(map);
+            if(task == null){
+                return new ResponseEntity(0,"网络异常",null);
+            }
 
 
             List<Menu> menus = userService.getMenu(userType);

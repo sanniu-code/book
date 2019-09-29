@@ -32,6 +32,8 @@ public interface LeaderMapper {
 
     public Integer isEffectiveTask(Map map);
 
+    public Task isExistTask(Map map);
+
 
     public Integer addTeacher(DoTeacher doTeacher);
 

@@ -256,4 +256,13 @@ public class LeaderServiceImpl implements LeaderService {
 
 
     }
+
+
+    @Override
+    public Task isExistTask(Integer departId) {
+        Map map = new HashMap();
+        map.put("departId",departId);
+        map.put("time",new Date());
+        return leaderMapper.isExistTask(map);
+    }
 }

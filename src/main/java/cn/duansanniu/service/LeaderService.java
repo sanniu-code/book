@@ -80,4 +80,6 @@ public interface LeaderService {
 
     public Integer updateStudent(Student student);
 
+    public Task isExistTask(Integer departId);
+
 }

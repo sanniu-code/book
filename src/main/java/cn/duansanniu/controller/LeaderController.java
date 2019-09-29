@@ -223,6 +223,24 @@ public class LeaderController {
         }
     }
 
+    @GetMapping("/isExistTask")
+    @ResponseBody
+    @ApiOperation("当前系中是否存在有效的任务")
+    public ResponseEntity isExistTask(
+            @RequestParam("departId") Integer departId
+    ){
+        try{
+            Task task = leaderService.isExistTask(departId);
+            if(task != null){
+                return new ResponseEntity(1,"存在",task);
+            }
+            return new ResponseEntity(2,"不存在",null);
+
+        }catch (Exception e){
+            return new ResponseEntity(0,"网络异常",null);
+        }
+    }
+
 
 
 
@@ -611,7 +629,7 @@ public class LeaderController {
             doProfession.setDepartId(departId);
             //先判断这个专业是否存在
             DoProfession doProfession1 = leaderService.isExsitProfession(doProfession);
-            if(doProfession != null){
+            if(doProfession1 != null){
                 return new ResponseEntity(0,"该专业已存在",null);
             }
 

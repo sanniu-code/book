@@ -63,6 +63,12 @@
           and unix_timestamp(startTime) &lt; unix_timestamp(#{time})
     </select>
 
+    <select id="isExistTask" parameterType="map" resultType="cn.duansanniu.entity.Task">
+        select * from t_task where departId = #{departId}
+          and unix_timestamp(endTime) &gt; unix_timestamp(#{time})
+          and unix_timestamp(startTime) &lt; unix_timestamp(#{time})
+    </select>
+
     <insert id="createTask" parameterType="map" >
         insert  into t_task(name,departId,year,startTime,endTime) values (#{name},#{departId},#{year},#{startTime},#{endTime})
     </insert>
