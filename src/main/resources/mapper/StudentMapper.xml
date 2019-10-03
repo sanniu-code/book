@@ -43,7 +43,7 @@
           left join t_student_subject tss on tts.id = tss.subjectId
           left join t_student ts on ts.username = tss.username
           left join t_teacher_file ttf on ttf.subjectId = tts.id
-          where tts.status = 1 and tts.taskId = 6 and ttf.fileType = 1
+          where tts.status = 1 and tts.taskId = #{taskId} and ttf.fileType = 1
     </select>
 
     <!--获取某个学生所报的课题的详情-->

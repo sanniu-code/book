@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,7 +74,7 @@ public class UserController {
                 }
 
                 if(departId <= 0){
-                    return new ResponseEntity(0,"账号错误",null);
+                    return new ResponseEntity(0,"账号不存在",null);
                 }
                 Map map = new HashMap();
                 map.put("departId",departId);
@@ -134,7 +135,7 @@ public class UserController {
             //获取相关信息
             return new ResponseEntity(1,"登录成功",o);
         }catch(Exception e){
-            return new ResponseEntity(0,"登录失败",null);
+            return new ResponseEntity(0,"网络异常",null);
         }
     }
 
@@ -180,7 +181,7 @@ public class UserController {
             //设置响应头,attachment表示以附件的形式下载，inline表示在线打开
             response.setHeader("content-disposition","attachment;fileName="+ URLEncoder.encode(fileName,"UTF-8"));
             //获取输出流对象
-            ServletOutputStream os = response.getOutputStream();
+            OutputStream os = response.getOutputStream();
             //下载文件使用 spring框架中的FileCopyUtils工具
             FileCopyUtils.copy(fis,os);
 

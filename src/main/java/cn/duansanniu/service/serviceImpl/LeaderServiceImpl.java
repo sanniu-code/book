@@ -146,7 +146,7 @@ public class LeaderServiceImpl implements LeaderService {
         doStudent.setName(student.getName());
         doStudent.setSex(student.getSex());
         doStudent.setUsername(student.getUsername());
-        doStudent.setPassword("1111111");
+        doStudent.setPassword("111");
 
 
 

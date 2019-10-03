@@ -119,6 +119,7 @@ public class StudentController {
 
             Subjects subject = studentService.getSubject(username);
 
+
             return new ResponseEntity(1,"获取成功",subject);
         }catch (Exception e){
             return new ResponseEntity(0,"获取失败",null);

@@ -439,7 +439,7 @@ public class LeaderController {
                 //密码
                 String pass = "";
                 if(content[1].length() == 0)
-                    pass = "111111";
+                    pass = "111";
                 pass = content[1];
 
                 doStudent.setPassword(pass);
@@ -680,7 +680,7 @@ public class LeaderController {
             doProfession.setDepartId(departId);
             //先判断这个专业是否存在
             DoProfession doProfession1 = leaderService.isExsitProfession(doProfession);
-            if(doProfession != null){
+            if(doProfession1 != null){
                 return new ResponseEntity(0,"该专业已存在",null);
             }
 

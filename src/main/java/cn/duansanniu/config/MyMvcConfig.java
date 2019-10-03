@@ -31,10 +31,10 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        /*registry.addInterceptor(myInterceptors)
+        registry.addInterceptor(myInterceptors)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/user/**")
-                .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");*/
+                .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**");
         super.addInterceptors(registry);
     }
 
