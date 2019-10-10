@@ -5,6 +5,7 @@ import cn.duansanniu.mapper.LeaderMapper;
 import cn.duansanniu.service.LeaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +17,7 @@ import java.util.Map;
  * @author duansanniu
  * @create 2019-09-15 20:58 下午
  */
+
 @Service
 public class LeaderServiceImpl implements LeaderService {
 
@@ -131,6 +133,7 @@ public class LeaderServiceImpl implements LeaderService {
     public Integer deleteStudent(DoStudent doStudent) {
         return leaderMapper.deleteStudent(doStudent);
     }
+
 
 
     @Override
@@ -251,10 +254,6 @@ public class LeaderServiceImpl implements LeaderService {
         }catch (Exception e){
             return  0;
         }
-
-
-
-
     }
 
 

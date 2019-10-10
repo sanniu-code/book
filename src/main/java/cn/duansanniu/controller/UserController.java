@@ -18,7 +18,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -225,11 +224,9 @@ public class UserController {
             // 生产验证码字符串并保存到session中
             String createText = captchaProducer.createText();
             request.getSession().setAttribute("vrifyCode", createText);
-
             // 使用生产的验证码字符串返回一个BufferedImage对象并转为byte写入到byte数组中
             BufferedImage challenge = captchaProducer.createImage(createText);
             ImageIO.write(challenge, "jpg", jpegOutputStream);
-
             // 定义response输出类型为image/jpeg类型，使用response输出流输出图片的byte数组
             captchaChallengeAsJpeg = jpegOutputStream.toByteArray();
             response.setHeader("Cache-Control", "no-store");
@@ -358,6 +355,7 @@ public class UserController {
 
 
             List<Menu> menus = userService.getMenu(userType);
+
 
             return new ResponseEntity(1,"获取成功",menus);
         }catch (Exception e){

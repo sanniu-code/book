@@ -50,11 +50,11 @@ public class MyInterceptors implements HandlerInterceptor {
                 response.getWriter().print(noShiro);
                 return false;
             case 2:
-                if(uri.startsWith("/teacher")) return true;
+                if(uri.startsWith("/teacher") || uri.startsWith("/student")) return true;
                 response.getWriter().print(noShiro);
                 return false;
             case 3:
-                if(uri.startsWith("/leader")) return true;
+                if(uri.startsWith("/leader") || uri.startsWith("/student") || uri.startsWith("/teacher")) return true;
                 response.getWriter().print(noShiro);
                 return false;
             default:
